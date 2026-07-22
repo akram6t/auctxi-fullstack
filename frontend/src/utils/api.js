@@ -16,11 +16,20 @@ api.interceptors.request.use(
       try {
         const user = JSON.parse(userStr);
         if (user.token) {
-          config.headers.Authorization = `Bearer ${user.token}`;
+          if (config.headers && typeof config.headers.set === 'function') {
+            config.headers.set('Authorization', `Bearer ${user.token}`);
+          } else {
+            config.headers.Authorization = `Bearer ${user.token}`;
+          }
+          console.log(`[API] Sending request to ${config.url} with token: ${user.token.substring(0, 10)}...`);
+        } else {
+          console.log(`[API] Sending request to ${config.url} WITHOUT token (no token in storage)`);
         }
       } catch (e) {
         console.error('Error parsing user from storage', e);
       }
+    } else {
+      console.log(`[API] Sending request to ${config.url} WITHOUT token (no user in storage)`);
     }
     return config;
   },
@@ -35,16 +44,14 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       console.error('API Error 401/403: ', error.response.data);
-      console.error('Clearing auth storage and redirecting to login');
+      console.error('Clearing auth storage due to invalid token.');
       
-      // Token might be expired or invalid. Clear storage and redirect to login.
+      // Token might be expired or invalid. Clear storage.
       localStorage.removeItem('auctxi_user');
       sessionStorage.removeItem('auctxi_user');
       
-      // Only redirect if we are not already on the login page
-      if (window.location.pathname !== '/auth/login' && window.location.pathname !== '/auth/signup') {
-        window.location.href = '/auth/login';
-      }
+      // Instead of forcing a hard reload, we can trigger a custom event or just let the React components handle it
+      window.dispatchEvent(new Event('auth-error'));
     }
     return Promise.reject(error);
   }

@@ -13,6 +13,13 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(storedUser));
     }
     setLoading(false);
+
+    // Listen for 401/403 errors from the API interceptor
+    const handleAuthError = () => {
+      logout();
+    };
+    window.addEventListener('auth-error', handleAuthError);
+    return () => window.removeEventListener('auth-error', handleAuthError);
   }, []);
 
   const login = (userData, rememberMe = false) => {
