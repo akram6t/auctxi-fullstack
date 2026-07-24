@@ -17,6 +17,10 @@ public class PlayerService {
         return playerRepository.findAll();
     }
 
+    public List<Player> getPlayersByTeamId(Long teamId) {
+        return playerRepository.findByTeamId(teamId);
+    }
+
     public Player addPlayer(Player player) {
         return playerRepository.save(player);
     }
@@ -29,6 +33,7 @@ public class PlayerService {
         player.setCountry(updatedPlayer.getCountry());
         player.setBasePrice(updatedPlayer.getBasePrice());
         player.setStatus(updatedPlayer.getStatus());
+        player.setImageUrl(updatedPlayer.getImageUrl());
         return playerRepository.save(player);
     }
 

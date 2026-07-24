@@ -16,7 +16,10 @@ public class PlayerController {
     private final PlayerService playerService;
 
     @GetMapping
-    public ResponseEntity<List<Player>> getAllPlayers() {
+    public ResponseEntity<List<Player>> getAllPlayers(@RequestParam(required = false) Long teamId) {
+        if (teamId != null) {
+            return ResponseEntity.ok(playerService.getPlayersByTeamId(teamId));
+        }
         return ResponseEntity.ok(playerService.getAllPlayers());
     }
     

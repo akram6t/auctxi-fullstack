@@ -24,6 +24,8 @@ public class Player {
     private String basePrice;
 
     private String status; // Available, Sold, Unsold
+    
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")

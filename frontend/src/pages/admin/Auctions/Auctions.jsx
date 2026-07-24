@@ -3,27 +3,39 @@ import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import api from '../../../utils/api';
 import AuctionList from './components/AuctionList';
-import CreateAuctionModal from './components/CreateAuctionModal';
+import AuctionModal from './components/CreateAuctionModal';
 
 const Auctions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAuction, setSelectedAuction] = useState(null);
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const handleOpenModal = (auction = null) => {
+    setSelectedAuction(auction);
+    setIsModalOpen(true);
+  };
+
+  const fetchAuctions = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/auctions');
+      setAuctions(response.data);
+    } catch (error) {
+      console.error("Failed to fetch auctions", error);
+      toast.error("Failed to load auctions");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAuctions = async () => {
-      try {
-        const response = await api.get('/auctions');
-        setAuctions(response.data);
-      } catch (error) {
-        console.error("Failed to fetch auctions", error);
-        toast.error("Failed to load auctions");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchAuctions();
   }, []);
+
+  const handleSaveAuction = async (savedAuction, isEdit) => {
+    await fetchAuctions();
+  };
 
   const totalAuctions = auctions.length;
   const liveNow = auctions.filter(a => a.status?.toUpperCase() === 'ACTIVE').length;
@@ -42,7 +54,7 @@ const Auctions = () => {
         </div>
         <div className="mt-4 sm:mt-0">
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => handleOpenModal()}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
           >
             <IconPlus size={18} className="mr-2" />
@@ -85,11 +97,19 @@ const Auctions = () => {
         </select>
       </div>
 
-      <AuctionList auctions={auctions} setAuctions={setAuctions} loading={loading} />
+      <AuctionList 
+        auctions={auctions} 
+        setAuctions={setAuctions} 
+        loading={loading}
+        onEdit={handleOpenModal}
+        onRefresh={fetchAuctions}
+      />
 
-      <CreateAuctionModal 
+      <AuctionModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        auction={selectedAuction}
+        onSave={handleSaveAuction}
       />
     </div>
   );

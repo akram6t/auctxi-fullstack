@@ -30,4 +30,6 @@ public class User {
     private String status;
 
     private String lastLogin;
+    
+    private String imageUrl;
 }

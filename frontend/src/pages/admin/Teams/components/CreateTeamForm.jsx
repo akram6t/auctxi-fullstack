@@ -4,6 +4,8 @@ import * as z from 'zod';
 import { IconX, IconUpload } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
+import { useState } from 'react';
+import ImageUpload from '../../../../components/ui/ImageUpload';
 
 const teamSchema = z.object({
   name: z.string().min(2, 'Team name is required'),
@@ -12,7 +14,9 @@ const teamSchema = z.object({
   status: z.enum(['Active', 'Inactive']),
 });
 
-const CreateTeamForm = ({ isOpen, onClose }) => {
+const CreateTeamForm = ({ isOpen, onClose, onSave }) => {
+  const [logoUrl, setLogoUrl] = useState('');
+
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(teamSchema),
     defaultValues: {
@@ -27,11 +31,15 @@ const CreateTeamForm = ({ isOpen, onClose }) => {
       // Map frontend fields to backend
       const payload = {
         name: data.name,
-        owner: data.managerName, // Backend might expect owner
+        ownerEmail: data.managerEmail,
         status: data.status,
+        logoUrl,
+        purse: '100 Cr', // Default 
+        squadSize: 0,
       };
       await api.post('/teams', payload);
       toast.success('Team ' + data.name + ' onboarded successfully!');
+      if (onSave) onSave();
       onClose();
     } catch (error) {
       console.error("Failed to create team", error);
@@ -54,10 +62,12 @@ const CreateTeamForm = ({ isOpen, onClose }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-4">
           
           <div className="flex justify-center mb-6">
-            <div className="w-24 h-24 rounded-xl border-2 border-dashed border-secondary-300 dark:border-secondary-700 flex flex-col items-center justify-center text-secondary-500 hover:text-primary-500 hover:border-primary-500 cursor-pointer transition-colors bg-secondary-50 dark:bg-secondary-800/50">
-              <IconUpload size={24} className="mb-1" />
-              <span className="text-xs font-medium">Team Logo</span>
-            </div>
+            <ImageUpload 
+              value={logoUrl}
+              onChange={setLogoUrl}
+              folder="teams"
+              label="Team Logo"
+            />
           </div>
 
           <div>

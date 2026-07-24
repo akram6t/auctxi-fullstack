@@ -1,14 +1,17 @@
 import { IconEdit, IconTrash, IconUserCircle } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
+import { useState } from 'react';
+import EditPlayerModal from './EditPlayerModal';
 
-const PlayerTable = ({ players, setPlayers, loading }) => {
+const PlayerTable = ({ players, setPlayers, loading, onRefresh }) => {
+  const [editPlayer, setEditPlayer] = useState(null);
 
   const handleDelete = async (id, name) => {
     try {
       await api.delete(`/players/${id}`);
-      setPlayers(players.filter(p => p.id !== id));
       toast.error(`${name} removed from pool`);
+      if (onRefresh) onRefresh();
     } catch (error) {
       toast.error("Failed to delete player");
     }
@@ -53,8 +56,12 @@ const PlayerTable = ({ players, setPlayers, loading }) => {
               <tr key={player.id} className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10 text-secondary-400 flex items-center justify-center bg-secondary-100 dark:bg-secondary-800 rounded-full">
-                      <IconUserCircle size={24} />
+                    <div className="flex-shrink-0 h-10 w-10 text-secondary-400 flex items-center justify-center bg-secondary-100 dark:bg-secondary-800 rounded-full overflow-hidden">
+                      {player.imageUrl ? (
+                        <img src={player.imageUrl} alt={player.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <IconUserCircle size={24} />
+                      )}
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-secondary-900 dark:text-white">
@@ -88,7 +95,7 @@ const PlayerTable = ({ players, setPlayers, loading }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => toast.info('Edit mode enabled for ' + player.name)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="Edit">
+                    <button onClick={() => setEditPlayer(player)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="Edit">
                       <IconEdit size={18} />
                     </button>
                     <button onClick={() => handleDelete(player.id, player.name)} className="text-secondary-400 hover:text-red-600 transition-colors p-1" title="Delete">
@@ -131,6 +138,12 @@ const PlayerTable = ({ players, setPlayers, loading }) => {
           </div>
         </div>
       </div>
+
+      <EditPlayerModal 
+        player={editPlayer}
+        onClose={() => setEditPlayer(null)}
+        onSave={onRefresh}
+      />
     </div>
   );
 };

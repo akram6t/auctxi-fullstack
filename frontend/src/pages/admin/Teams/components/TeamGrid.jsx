@@ -1,14 +1,15 @@
 import { IconEdit, IconTrash, IconUsersGroup } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 import api from '../../../../utils/api';
 
-const TeamGrid = ({ teams, setTeams, loading }) => {
+const TeamGrid = ({ teams, setTeams, loading, onRefresh }) => {
 
   const handleDelete = async (id, name) => {
     try {
       await api.delete(`/teams/${id}`);
-      setTeams(teams.filter(t => t.id !== id));
       toast.error(`${name} deleted`);
+      if (onRefresh) onRefresh();
     } catch (error) {
       toast.error("Failed to delete team");
     }
@@ -26,8 +27,12 @@ const TeamGrid = ({ teams, setTeams, loading }) => {
       ) : teams.map((team) => (
         <div key={team.id} className="bg-white dark:bg-secondary-900 shadow-sm hover:shadow-md rounded-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden transition-all group">
           <div className={`h-24 bg-gradient-to-r ${team.color || 'from-primary-500 to-primary-700'} relative`}>
-            <div className="absolute -bottom-6 left-6 h-12 w-12 rounded-lg bg-white dark:bg-secondary-800 shadow-sm flex items-center justify-center p-2 border border-secondary-100 dark:border-secondary-700">
-              <IconUsersGroup size={24} className="text-secondary-400" />
+            <div className="absolute -bottom-6 left-6 h-12 w-12 rounded-lg bg-white dark:bg-secondary-800 shadow-sm flex items-center justify-center p-0.5 border border-secondary-100 dark:border-secondary-700 overflow-hidden">
+              {team.logoUrl ? (
+                <img src={team.logoUrl} alt={team.name} className="h-full w-full object-cover rounded-md" />
+              ) : (
+                <IconUsersGroup size={24} className="text-secondary-400" />
+              )}
             </div>
             <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button onClick={() => toast.info('Edit mode enabled for ' + team.name)} className="p-1.5 bg-white/20 hover:bg-white/40 rounded-md text-white backdrop-blur-sm transition-colors">
@@ -46,14 +51,14 @@ const TeamGrid = ({ teams, setTeams, loading }) => {
               </h3>
             </div>
             <p className="text-sm text-secondary-500 dark:text-secondary-400 mb-4">
-              Owner: {team.owner || 'N/A'}
+              Owner: {team.ownerEmail || 'N/A'}
             </p>
             
             <div className="space-y-3">
               <div>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-secondary-500">Purse Remaining</span>
-                  <span className="font-semibold text-secondary-900 dark:text-white">{team.purseBalance}</span>
+                  <span className="font-semibold text-secondary-900 dark:text-white">{team.purse || '0 Cr'}</span>
                 </div>
                 <div className="w-full bg-secondary-100 dark:bg-secondary-800 rounded-full h-1.5">
                   <div className={`h-1.5 rounded-full bg-gradient-to-r ${team.color || 'from-primary-500 to-primary-700'}`} style={{ width: '65%' }}></div>
@@ -63,10 +68,10 @@ const TeamGrid = ({ teams, setTeams, loading }) => {
               <div>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-secondary-500">Squad Size</span>
-                  <span className="font-semibold text-secondary-900 dark:text-white">{team.totalPlayers || 0} / {team.maxPlayers || 25}</span>
+                  <span className="font-semibold text-secondary-900 dark:text-white">{team.squadSize || 0} / 25</span>
                 </div>
                 <div className="w-full bg-secondary-100 dark:bg-secondary-800 rounded-full h-1.5">
-                  <div className={`h-1.5 rounded-full bg-gradient-to-r ${team.color || 'from-primary-500 to-primary-700'}`} style={{ width: `${((team.totalPlayers || 0)/(team.maxPlayers || 25))*100}%` }}></div>
+                  <div className={`h-1.5 rounded-full bg-gradient-to-r ${team.color || 'from-primary-500 to-primary-700'}`} style={{ width: `${((team.squadSize || 0)/25)*100}%` }}></div>
                 </div>
               </div>
             </div>
@@ -75,11 +80,14 @@ const TeamGrid = ({ teams, setTeams, loading }) => {
               <span className={`px-2 py-0.5 text-xs font-medium rounded-md ${
                 team.status === 'Active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-secondary-100 text-secondary-600 dark:bg-secondary-800 dark:text-secondary-400'
               }`}>
-                {team.status}
+                {team.status || 'Active'}
               </span>
-              <button onClick={() => toast.info('Loading squad details for ' + team.name)} className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors">
-                View Squad →
-              </button>
+              <Link 
+                to={`/admin/teams/${team.id}`}
+                className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors"
+              >
+                View Squad &rarr;
+              </Link>
             </div>
           </div>
         </div>

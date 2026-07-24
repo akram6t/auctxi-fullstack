@@ -2,13 +2,24 @@ import { IconEdit, IconTrash, IconEye, IconPlayerPlay } from '@tabler/icons-reac
 import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
 
-const AuctionList = ({ auctions, setAuctions, loading }) => {
+const AuctionList = ({ auctions, setAuctions, loading, onEdit, onRefresh }) => {
+
+  const handleStartAuction = async (auction) => {
+    try {
+      const payload = { ...auction, status: 'Active' };
+      await api.put(`/auctions/${auction.id}`, payload);
+      toast.success(`${auction.name} is now LIVE!`);
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      toast.error("Failed to start auction");
+    }
+  };
 
   const handleDelete = async (id, name) => {
     try {
       await api.delete(`/auctions/${id}`);
-      setAuctions(auctions.filter(a => a.id !== id));
       toast.error(`${name} deleted`);
+      if (onRefresh) onRefresh();
     } catch (error) {
       toast.error("Failed to delete auction");
     }
@@ -84,11 +95,11 @@ const AuctionList = ({ auctions, setAuctions, loading }) => {
                       <IconEye size={18} />
                     </button>
                     {auction.status === 'Upcoming' && (
-                      <button onClick={() => toast.success('Starting ' + auction.name + '...')} className="text-secondary-400 hover:text-green-600 transition-colors p-1" title="Start Auction">
+                      <button onClick={() => handleStartAuction(auction)} className="text-secondary-400 hover:text-green-600 transition-colors p-1" title="Start Auction">
                         <IconPlayerPlay size={18} />
                       </button>
                     )}
-                    <button onClick={() => toast.info('Edit mode enabled')} className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="Edit">
+                    <button onClick={() => onEdit(auction)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="Edit">
                       <IconEdit size={18} />
                     </button>
                     <button onClick={() => handleDelete(auction.id, auction.name)} className="text-secondary-400 hover:text-red-600 transition-colors p-1" title="Delete">

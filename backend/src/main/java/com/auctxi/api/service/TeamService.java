@@ -17,6 +17,11 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
+    public Team getTeamById(Long id) {
+        return teamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+    }
+
     public Team createTeam(Team team) {
         return teamRepository.save(team);
     }
@@ -28,6 +33,8 @@ public class TeamService {
         team.setOwnerEmail(updatedTeam.getOwnerEmail());
         team.setPurse(updatedTeam.getPurse());
         team.setSquadSize(updatedTeam.getSquadSize());
+        team.setLogoUrl(updatedTeam.getLogoUrl());
+        team.setStatus(updatedTeam.getStatus());
         return teamRepository.save(team);
     }
 

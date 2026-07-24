@@ -1,6 +1,7 @@
 import StatCards from './components/StatCards';
 import RevenueChart from './components/RevenueChart';
 import RecentActivityTable from './components/RecentActivityTable';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   return (
@@ -42,9 +43,9 @@ const Dashboard = () => {
               <div className="w-full bg-primary-900/50 rounded-full h-2">
                 <div className="bg-white h-2 rounded-full" style={{ width: '80%' }}></div>
               </div>
-              <button className="mt-6 w-full bg-white text-primary-700 font-medium py-2 rounded-lg hover:bg-primary-50 transition-colors">
+              <Link to="/admin/auctions" className="mt-6 w-full bg-white text-primary-700 font-medium py-2 rounded-lg hover:bg-primary-50 transition-colors text-center inline-block">
                 Manage Auction
-              </button>
+              </Link>
             </div>
           </div>
         </div>

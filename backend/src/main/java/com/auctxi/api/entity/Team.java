@@ -22,4 +22,8 @@ public class Team {
     private String purse;
     
     private Integer squadSize;
+    
+    private String logoUrl;
+    
+    private String status;
 }

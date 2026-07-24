@@ -9,6 +9,7 @@ import Signup from './pages/auth/Signup/Signup';
 import AdminDashboard from './pages/admin/Dashboard/Dashboard';
 import AdminAuctions from './pages/admin/Auctions/Auctions';
 import AdminTeams from './pages/admin/Teams/Teams';
+import AdminTeamDetails from './pages/admin/Teams/TeamDetails';
 import AdminPlayers from './pages/admin/Players/Players';
 import AdminUsers from './pages/admin/Users/Users';
 import AdminPayments from './pages/admin/Payments/Payments';
@@ -49,6 +50,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="auctions" element={<AdminAuctions />} />
               <Route path="teams" element={<AdminTeams />} />
+              <Route path="teams/:id" element={<AdminTeamDetails />} />
               <Route path="players" element={<AdminPlayers />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="payments" element={<AdminPayments />} />

@@ -10,4 +10,4 @@ public class AuctxiApiApplication {
 		SpringApplication.run(AuctxiApiApplication.class, args);
 	}
 
-}
+}		

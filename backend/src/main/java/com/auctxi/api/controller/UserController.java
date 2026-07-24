@@ -25,6 +25,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
+    }
+
     @PutMapping("/{id}/suspend")
     public ResponseEntity<User> suspendUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.updateUserStatus(id, "Suspended"));

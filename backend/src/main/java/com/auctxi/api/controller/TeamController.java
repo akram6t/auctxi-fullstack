@@ -19,6 +19,11 @@ public class TeamController {
     public ResponseEntity<List<Team>> getAllTeams() {
         return ResponseEntity.ok(teamService.getAllTeams());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Team> getTeamById(@PathVariable Long id) {
+        return ResponseEntity.ok(teamService.getTeamById(id));
+    }
     
     @PostMapping
     public ResponseEntity<Team> createTeam(@RequestBody Team team) {

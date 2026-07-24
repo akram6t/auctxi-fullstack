@@ -10,18 +10,19 @@ const Teams = () => {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchTeams = async () => {
+    try {
+      const response = await api.get('/teams');
+      setTeams(response.data);
+    } catch (error) {
+      console.error("Failed to fetch teams", error);
+      toast.error("Failed to load teams");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        const response = await api.get('/teams');
-        setTeams(response.data);
-      } catch (error) {
-        console.error("Failed to fetch teams", error);
-        toast.error("Failed to load teams");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTeams();
   }, []);
 
@@ -85,11 +86,12 @@ const Teams = () => {
         </div>
       </div>
 
-      <TeamGrid teams={teams} setTeams={setTeams} loading={loading} />
+      <TeamGrid teams={teams} setTeams={setTeams} loading={loading} onRefresh={fetchTeams} />
 
       <CreateTeamForm 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onSave={fetchTeams}
       />
     </div>
   );

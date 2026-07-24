@@ -1,5 +1,6 @@
 import { IconGavel, IconUsers, IconRun, IconCurrencyDollar } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../../../utils/api';
 
 const StatCards = () => {
@@ -26,10 +27,10 @@ const StatCards = () => {
   }, []);
 
   const stats = [
-    { name: 'Total Auctions', value: statsData.totalAuctions, icon: IconGavel, change: '+12%', changeType: 'positive' },
-    { name: 'Registered Teams', value: statsData.totalTeams, icon: IconUsers, change: '+4.5%', changeType: 'positive' },
-    { name: 'Players Pool', value: statsData.totalPlayers, icon: IconRun, change: '+18.2%', changeType: 'positive' },
-    { name: 'Total Users', value: statsData.totalUsers, icon: IconCurrencyDollar, change: '+8.1%', changeType: 'positive' },
+    { name: 'Total Auctions', value: statsData.totalAuctions, icon: IconGavel, change: '+12%', changeType: 'positive', link: '/admin/auctions' },
+    { name: 'Registered Teams', value: statsData.totalTeams, icon: IconUsers, change: '+4.5%', changeType: 'positive', link: '/admin/teams' },
+    { name: 'Players Pool', value: statsData.totalPlayers, icon: IconRun, change: '+18.2%', changeType: 'positive', link: '/admin/players' },
+    { name: 'Total Users', value: statsData.totalUsers, icon: IconCurrencyDollar, change: '+8.1%', changeType: 'positive', link: '/admin/users' },
   ];
 
   return (
@@ -60,9 +61,9 @@ const StatCards = () => {
             </p>
             <div className="absolute bottom-0 inset-x-0 bg-secondary-50 dark:bg-secondary-800/50 px-4 py-4 sm:px-6 border-t border-secondary-100 dark:border-secondary-800">
               <div className="text-sm">
-                <a href="#" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors">
+                <Link to={item.link} className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors">
                   View all<span className="sr-only"> {item.name} stats</span>
-                </a>
+                </Link>
               </div>
             </div>
           </dd>

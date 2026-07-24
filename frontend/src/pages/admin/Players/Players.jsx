@@ -9,25 +9,38 @@ const Players = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All Roles');
+  const [statusFilter, setStatusFilter] = useState('All Statuses');
+
+  const fetchPlayers = async () => {
+    try {
+      const response = await api.get('/players');
+      setPlayers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch players", error);
+      toast.error("Failed to load players");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await api.get('/players');
-        setPlayers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch players", error);
-        toast.error("Failed to load players");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchPlayers();
   }, []);
 
   const totalPlayers = players.length;
   const soldPlayers = players.filter(p => p.status?.toLowerCase() === 'sold').length;
-  const availablePlayers = players.filter(p => p.status?.toLowerCase() === 'available').length;
+  const availablePlayers = players.filter(p => p.status?.toLowerCase() === 'available').length || players.filter(p => !p.status || p.status.toLowerCase() === 'available').length;
+
+  const filteredPlayers = players.filter(p => {
+    const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.country || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = roleFilter === 'All Roles' || p.role === roleFilter;
+    const matchesStatus = statusFilter === 'All Statuses' || (p.status || 'Available').toLowerCase() === statusFilter.toLowerCase();
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -79,19 +92,29 @@ const Players = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg leading-5 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white placeholder-secondary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-shadow"
             placeholder="Search players by name or country..."
           />
         </div>
         <div className="flex gap-2">
-          <select className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow">
+          <select 
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow"
+          >
             <option>All Roles</option>
             <option>Batter</option>
             <option>Bowler</option>
             <option>All-Rounder</option>
             <option>Wicket-Keeper</option>
           </select>
-          <select className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow">
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow"
+          >
             <option>All Statuses</option>
             <option>Available</option>
             <option>Sold</option>
@@ -103,11 +126,12 @@ const Players = () => {
         </div>
       </div>
 
-      <PlayerTable players={players} setPlayers={setPlayers} loading={loading} />
+      <PlayerTable players={filteredPlayers} setPlayers={setPlayers} loading={loading} onRefresh={fetchPlayers} />
 
       <AddPlayerForm 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onSave={fetchPlayers}
       />
     </div>
   );
