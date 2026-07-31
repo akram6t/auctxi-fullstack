@@ -2,10 +2,19 @@ import { IconSearch, IconFilter, IconStar, IconStarFilled } from '@tabler/icons-
 import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
 import { toast } from 'react-toastify';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const ScoutingPlayerList = () => {
+  const { currencySymbol } = useSettings();
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All Roles');
+  const [shortlist, setShortlist] = useState(() => {
+    const saved = localStorage.getItem('shortlist');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -21,6 +30,26 @@ const ScoutingPlayerList = () => {
     };
     fetchPlayers();
   }, []);
+
+  const toggleShortlist = (playerId) => {
+    let updated;
+    if (shortlist.includes(playerId)) {
+      updated = shortlist.filter(id => id !== playerId);
+      toast.success('Removed from shortlist');
+    } else {
+      updated = [...shortlist, playerId];
+      toast.success('Added to shortlist');
+    }
+    setShortlist(updated);
+    localStorage.setItem('shortlist', JSON.stringify(updated));
+  };
+
+  const filteredPlayers = players.filter(p => {
+    const matchesSearch = (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 
+                          (p.country?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === 'All Roles' || p.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
   return (
     <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden">
       <div className="p-4 border-b border-secondary-200 dark:border-secondary-800 flex flex-col sm:flex-row gap-4 items-center bg-secondary-50 dark:bg-secondary-800/50">
@@ -30,17 +59,23 @@ const ScoutingPlayerList = () => {
           </div>
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg leading-5 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-shadow"
             placeholder="Scout players by name or country..."
           />
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <select className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white transition-shadow">
+          <select 
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white transition-shadow"
+          >
             <option>All Roles</option>
-            <option>Batsman</option>
+            <option>Batter</option>
             <option>Bowler</option>
             <option>All-Rounder</option>
-            <option>Wicket-Keeper</option>
+            <option>Wicketkeeper</option>
           </select>
           <button className="px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-500 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800 bg-white dark:bg-secondary-900 transition-colors">
             <IconFilter size={20} />
@@ -66,13 +101,13 @@ const ScoutingPlayerList = () => {
                   Loading players...
                 </td>
               </tr>
-            ) : players.length === 0 ? (
+            ) : filteredPlayers.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-6 py-4 text-center text-sm text-secondary-500">
                   No players found.
                 </td>
               </tr>
-            ) : players.map((player) => (
+            ) : filteredPlayers.map((player) => (
               <tr key={player.id} className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
@@ -91,8 +126,8 @@ const ScoutingPlayerList = () => {
                   <div className="text-sm text-secondary-900 dark:text-white font-medium">{player.role}</div>
                   <div className="text-xs text-secondary-500">{player.country || 'Unknown'}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-secondary-900 dark:text-white">
-                  ${player.basePrice}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900 dark:text-white font-medium">
+                  {currencySymbol}{player.basePrice}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -103,12 +138,12 @@ const ScoutingPlayerList = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button onClick={() => toast.success(player.shortlisted ? 'Removed from shortlist' : 'Added to shortlist')} className={`p-1.5 rounded-full transition-colors ${
-                    player.shortlisted 
+                  <button onClick={() => toggleShortlist(player.id)} className={`p-1.5 rounded-full transition-colors ${
+                    shortlist.includes(player.id) 
                       ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' 
                       : 'text-secondary-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
-                  }`} title={player.shortlisted ? 'Remove from shortlist' : 'Add to shortlist'}>
-                    {player.shortlisted ? <IconStarFilled size={20} /> : <IconStar size={20} />}
+                  }`} title={shortlist.includes(player.id) ? 'Remove from shortlist' : 'Add to shortlist'}>
+                    {shortlist.includes(player.id) ? <IconStarFilled size={20} /> : <IconStar size={20} />}
                   </button>
                 </td>
               </tr>

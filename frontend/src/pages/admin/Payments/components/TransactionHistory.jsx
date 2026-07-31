@@ -1,7 +1,46 @@
 import { IconDownload, IconCheck, IconX, IconClockHour4 } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
+import api from '../../../../utils/api';
+import { useSettings } from '../../../../context/SettingsContext';
 
-const TransactionHistory = ({ transactions, setTransactions, loading }) => {
+const TransactionHistory = ({ transactions, setTransactions, loading, onRefresh }) => {
+  const { currencySymbol } = useSettings();
+  const handleStatusChange = async (id, status) => {
+    try {
+      await api.put(`/payments/${id}/status`, { status });
+      toast.success(`Transaction ${status.toLowerCase()} successfully`);
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      toast.error('Failed to update transaction status');
+    }
+  };
+
+  const downloadReceipt = (txn) => {
+    const receiptContent = `
+=========================================
+          TRANSACTION RECEIPT
+=========================================
+Transaction ID : TXN-${txn.id}
+Date           : ${new Date(txn.date).toLocaleString()}
+Reference      : ${txn.reference || 'N/A'}
+Type           : ${txn.type}
+Amount         : ${currencySymbol}${txn.amount}
+Status         : ${txn.status}
+=========================================
+Thank you for using Auctxi!
+    `.trim();
+
+    const blob = new Blob([receiptContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `receipt_TXN-${txn.id}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Receipt downloaded successfully');
+  };
+
   return (
     <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden">
       <div className="overflow-x-auto">
@@ -58,8 +97,8 @@ const TransactionHistory = ({ transactions, setTransactions, loading }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600 dark:text-secondary-300">
                   {txn.type}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-secondary-900 dark:text-white">
-                  ${txn.amount}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900 dark:text-white font-medium">
+                  {currencySymbol}{txn.amount}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2.5 py-1 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full ${
@@ -74,8 +113,18 @@ const TransactionHistory = ({ transactions, setTransactions, loading }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => toast.success('Receipt downloaded for TXN-' + txn.id)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1 flex items-center gap-1 text-xs" title="Download Receipt">
+                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {(!txn.status || txn.status === 'Pending') && (
+                      <>
+                        <button onClick={() => handleStatusChange(txn.id, 'Success')} className="text-green-500 hover:text-green-600 transition-colors p-1" title="Approve Transaction">
+                          <IconCheck size={18} />
+                        </button>
+                        <button onClick={() => handleStatusChange(txn.id, 'Failed')} className="text-red-500 hover:text-red-600 transition-colors p-1" title="Reject Transaction">
+                          <IconX size={18} />
+                        </button>
+                      </>
+                    )}
+                    <button onClick={() => downloadReceipt(txn)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1 flex items-center gap-1 text-xs" title="Download Receipt">
                       <IconDownload size={16} /> Receipt
                     </button>
                   </div>

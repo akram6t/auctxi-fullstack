@@ -1,4 +1,5 @@
-import { IconGavel, IconCalendarEvent, IconUsers } from '@tabler/icons-react';
+import { IconGavel, IconCalendarEvent, IconUsers, IconWallet, IconRun, IconCheck } from '@tabler/icons-react';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const stats = [
   {

@@ -1,9 +1,11 @@
-import { IconGavel, IconUsers, IconRun, IconCurrencyDollar } from '@tabler/icons-react';
+import { IconGavel, IconUsers, IconRun, IconCurrencyDollar, IconCash, IconArrowUpRight, IconArrowDownRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../../../utils/api';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const StatCards = () => {
+  const { currencySymbol } = useSettings();
   const [statsData, setStatsData] = useState({
     totalAuctions: 0,
     totalTeams: 0,
@@ -27,7 +29,7 @@ const StatCards = () => {
   }, []);
 
   const stats = [
-    { name: 'Total Auctions', value: statsData.totalAuctions, icon: IconGavel, change: '+12%', changeType: 'positive', link: '/admin/auctions' },
+    { name: 'Total Revenue', value: `${currencySymbol}2.4M`, icon: IconCash, change: '+12.5%', changeType: 'positive', link: '/admin/revenue' },
     { name: 'Registered Teams', value: statsData.totalTeams, icon: IconUsers, change: '+4.5%', changeType: 'positive', link: '/admin/teams' },
     { name: 'Players Pool', value: statsData.totalPlayers, icon: IconRun, change: '+18.2%', changeType: 'positive', link: '/admin/players' },
     { name: 'Total Users', value: statsData.totalUsers, icon: IconCurrencyDollar, change: '+8.1%', changeType: 'positive', link: '/admin/users' },

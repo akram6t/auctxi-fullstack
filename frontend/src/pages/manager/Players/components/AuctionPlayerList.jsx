@@ -2,25 +2,21 @@ import { IconSearch, IconFilter, IconListDetails, IconGavel } from '@tabler/icon
 import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
 import { toast } from 'react-toastify';
+import { useSettings } from '../../../../context/SettingsContext';
 
-const AuctionPlayerList = () => {
-  const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
+const AuctionPlayerList = ({ players = [], loading = false }) => {
+  const { currencySymbol } = useSettings();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All');
 
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await api.get('/players');
-        setPlayers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch players", error);
-        toast.error("Failed to load players");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPlayers();
-  }, []);
+  // Derive roles from players
+  const uniqueRoles = ['All', ...new Set(players.map(p => p.role).filter(Boolean))];
+
+  const filteredPlayers = players.filter(player => {
+    const matchesSearch = player.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === 'All' || player.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
   return (
     <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden">
       <div className="p-4 border-b border-secondary-200 dark:border-secondary-800 flex flex-col sm:flex-row gap-4 items-center bg-secondary-50 dark:bg-secondary-800/50">
@@ -30,15 +26,21 @@ const AuctionPlayerList = () => {
           </div>
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg leading-5 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-shadow"
             placeholder="Search players..."
           />
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <select className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white transition-shadow">
-            <option>All Sets</option>
-            <option>Marquee 1</option>
-            <option>Set 2: Batsmen</option>
+          <select 
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white transition-shadow"
+          >
+            {uniqueRoles.map(role => (
+                <option key={role} value={role}>{role}</option>
+            ))}
           </select>
           <button className="px-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg text-secondary-500 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800 bg-white dark:bg-secondary-900 transition-colors">
             <IconFilter size={20} />
@@ -64,13 +66,13 @@ const AuctionPlayerList = () => {
                   Loading players...
                 </td>
               </tr>
-            ) : players.length === 0 ? (
+            ) : filteredPlayers.length === 0 ? (
               <tr>
                 <td colSpan="5" className="px-6 py-4 text-center text-sm text-secondary-500">
-                  No players found.
+                  No players found matching your criteria.
                 </td>
               </tr>
-            ) : players.map((player) => (
+            ) : filteredPlayers.map((player) => (
               <tr key={player.id} className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
@@ -89,8 +91,8 @@ const AuctionPlayerList = () => {
                   <div className="text-sm text-secondary-900 dark:text-white font-medium">{player.role}</div>
                   <div className="text-xs text-secondary-500">{player.set || 'Unset'}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-secondary-900 dark:text-white">
-                  ${player.basePrice}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900 dark:text-white font-medium">
+                  {currencySymbol}{player.basePrice}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -105,9 +107,9 @@ const AuctionPlayerList = () => {
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  {player.status === 'Available' ? (
-                     <button onClick={() => toast.success(`${player.name} brought to auction block`)} className="inline-flex items-center text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-md transition-colors">
-                       <IconGavel size={16} className="mr-1" /> Bring to Block
+                  {player.status && player.status.toLowerCase() === 'available' ? (
+                     <button onClick={() => toast.success(`${player.name} is available for auction`)} className="inline-flex items-center text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-md transition-colors">
+                       <IconGavel size={16} className="mr-1" /> View Availability
                      </button>
                   ) : (
                     <button className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="View Details">

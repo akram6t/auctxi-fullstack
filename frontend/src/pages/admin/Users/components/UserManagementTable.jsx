@@ -1,17 +1,18 @@
 import { IconEdit, IconTrash, IconLock, IconLockOpen, IconMail } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
+import { useState } from 'react';
+import EditUserModal from './EditUserModal';
 
-const UserManagementTable = ({ users, setUsers, loading }) => {
+const UserManagementTable = ({ users, setUsers, loading, onRefresh }) => {
+  const [editUser, setEditUser] = useState(null);
 
   const handleSuspend = async (id, name, currentStatus) => {
     try {
       const newStatus = currentStatus === 'Suspended' ? 'Active' : 'Suspended';
-      // Use our backend suspend endpoint (wait, our backend only suspends, but we can update to just set status)
-      // I'll call the standard suspend endpoint for now.
-      await api.put(`/users/${id}/suspend`);
-      setUsers(users.map(u => u.id === id ? { ...u, status: 'Suspended' } : u));
-      toast.warning(`${name} has been suspended`);
+      await api.put(`/users/${id}`, { status: newStatus });
+      toast.warning(`${name} status changed to ${newStatus}`);
+      if (onRefresh) onRefresh();
     } catch (error) {
       toast.error("Failed to change user status");
     }
@@ -20,8 +21,8 @@ const UserManagementTable = ({ users, setUsers, loading }) => {
   const handleDelete = async (id, name) => {
     try {
       await api.delete(`/users/${id}`);
-      setUsers(users.filter(u => u.id !== id));
       toast.error(`Deleted user ${name}`);
+      if (onRefresh) onRefresh();
     } catch (error) {
       toast.error("Failed to delete user");
     }
@@ -82,8 +83,8 @@ const UserManagementTable = ({ users, setUsers, loading }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full capitalize ${
-                    user.role === 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
-                    user.role === 'manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                    user.role?.toLowerCase() === 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
+                    user.role?.toLowerCase() === 'manager' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
                     'bg-secondary-100 text-secondary-800 dark:bg-secondary-800 dark:text-secondary-300'
                   }`}>
                     {user.role}
@@ -103,7 +104,7 @@ const UserManagementTable = ({ users, setUsers, loading }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => toast.info('Edit mode enabled for ' + user.name)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="Edit User">
+                    <button onClick={() => setEditUser(user)} className="text-secondary-400 hover:text-primary-600 transition-colors p-1" title="Edit User">
                       <IconEdit size={18} />
                     </button>
                     {user.status === 'Suspended' ? (
@@ -149,6 +150,12 @@ const UserManagementTable = ({ users, setUsers, loading }) => {
           </div>
         </div>
       </div>
+
+      <EditUserModal 
+        user={editUser}
+        onClose={() => setEditUser(null)}
+        onSave={onRefresh}
+      />
     </div>
   );
 };

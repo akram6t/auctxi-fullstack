@@ -3,13 +3,17 @@ import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import TransactionHistory from './components/TransactionHistory';
+import { useSettings } from '../../../context/SettingsContext';
 
 const Payments = () => {
+  const { currencySymbol } = useSettings();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('All Types');
+  const [statusFilter, setStatusFilter] = useState('All Statuses');
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
+  const fetchTransactions = async () => {
       try {
         const response = await api.get('/payments');
         setTransactions(response.data);
@@ -20,13 +24,57 @@ const Payments = () => {
         setLoading(false);
       }
     };
+  
+  useEffect(() => {
     fetchTransactions();
   }, []);
 
-  const totalVolume = transactions.reduce((acc, t) => acc + (t.amount || 0), 0);
-  const pendingVolume = transactions.filter(t => t.status?.toLowerCase() === 'pending').reduce((acc, t) => acc + (t.amount || 0), 0);
-  const successfulTxns = transactions.filter(t => t.status?.toLowerCase() === 'completed').length;
-  const totalTxns = transactions.length;
+  const filteredTransactions = transactions.filter(t => {
+    const matchSearch = `TXN-${t.id}`.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        (t.reference || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchType = typeFilter === 'All Types' || (t.type || '').toLowerCase() === typeFilter.toLowerCase();
+    const matchStatus = statusFilter === 'All Statuses' || (t.status || 'Pending').toLowerCase() === statusFilter.toLowerCase();
+    
+    return matchSearch && matchType && matchStatus;
+  });
+
+  const totalVolume = filteredTransactions.filter(t => t.status?.toLowerCase() === 'success').reduce((acc, t) => acc + (t.amount || 0), 0);
+  const pendingVolume = filteredTransactions.filter(t => !t.status || t.status.toLowerCase() === 'pending').reduce((acc, t) => acc + (t.amount || 0), 0);
+  const successfulTxns = filteredTransactions.filter(t => t.status?.toLowerCase() === 'success').length;
+  const totalTxns = filteredTransactions.length;
+
+  const exportToCSV = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error('No transactions to export');
+      return;
+    }
+    
+    const headers = ['Transaction ID', 'Date', 'Reference', 'Type', 'Amount', 'Status'];
+    const csvRows = [headers.join(',')];
+    
+    filteredTransactions.forEach(t => {
+      const row = [
+        `TXN-${t.id}`,
+        `"${new Date(t.date).toLocaleString()}"`,
+        `"${t.reference || 'N/A'}"`,
+        `"${t.type || 'N/A'}"`,
+        t.amount,
+        `"${t.status || 'Pending'}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ledger_export_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Ledger exported successfully');
+  };
 
   return (
     <div className="space-y-6">
@@ -41,7 +89,7 @@ const Payments = () => {
         </div>
         <div className="mt-4 sm:mt-0">
           <button 
-            onClick={() => toast.info('Exporting ledger as CSV...')}
+            onClick={exportToCSV}
             className="inline-flex items-center px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg shadow-sm text-sm font-medium text-secondary-700 dark:text-secondary-300 bg-white dark:bg-secondary-800 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none transition-colors"
           >
             <IconDownload size={18} className="mr-2" />
@@ -51,13 +99,17 @@ const Payments = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
-        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
-          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Total Processed Volume</dt>
-          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">{loading ? '...' : `$${totalVolume.toLocaleString()}`}</dd>
+        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800">
+          <div className="p-5">
+            <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Total Processed Volume</dt>
+            <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">{loading ? '...' : `${currencySymbol}${totalVolume.toLocaleString()}`}</dd>
+          </div>
         </div>
-        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
-          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Pending Transactions</dt>
-          <dd className="mt-1 text-3xl font-semibold text-yellow-600">{loading ? '...' : `$${pendingVolume.toLocaleString()}`}</dd>
+        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800">
+          <div className="p-5">
+            <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Pending Transactions</dt>
+            <dd className="mt-1 text-3xl font-semibold text-yellow-600">{loading ? '...' : `${currencySymbol}${pendingVolume.toLocaleString()}`}</dd>
+          </div>
         </div>
         <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
           <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Successful Transactions</dt>
@@ -72,18 +124,28 @@ const Payments = () => {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg leading-5 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white placeholder-secondary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-shadow"
             placeholder="Search by Transaction ID or Team..."
           />
         </div>
         <div className="flex gap-2">
-          <select className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow">
+          <select 
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow"
+          >
             <option>All Types</option>
             <option>Entry Fee</option>
             <option>Purse Top-up</option>
             <option>Player Purchase</option>
           </select>
-          <select className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow">
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="block w-full sm:w-40 pl-3 pr-10 py-2 text-base border-secondary-300 dark:border-secondary-700 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-lg bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow"
+          >
             <option>All Statuses</option>
             <option>Success</option>
             <option>Pending</option>
@@ -95,7 +157,7 @@ const Payments = () => {
         </div>
       </div>
 
-      <TransactionHistory transactions={transactions} setTransactions={setTransactions} loading={loading} />
+      <TransactionHistory transactions={filteredTransactions} setTransactions={setTransactions} loading={loading} onRefresh={fetchTransactions} />
     </div>
   );
 };

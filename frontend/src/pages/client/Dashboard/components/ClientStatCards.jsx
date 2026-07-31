@@ -1,41 +1,85 @@
 import { IconWallet, IconUsers, IconStar, IconCalendarEvent } from '@tabler/icons-react';
-
-const stats = [
-  {
-    name: 'Remaining Purse',
-    value: '$4,500,000',
-    icon: IconWallet,
-    trend: 'Out of $10M total',
-    color: 'text-green-600 dark:text-green-400',
-    bgColor: 'bg-green-100 dark:bg-green-900/30'
-  },
-  {
-    name: 'Squad Size',
-    value: '18',
-    icon: IconUsers,
-    trend: 'Max 25 players',
-    color: 'text-primary-600 dark:text-primary-400',
-    bgColor: 'bg-primary-100 dark:bg-primary-900/30'
-  },
-  {
-    name: 'Shortlisted Players',
-    value: '24',
-    icon: IconStar,
-    trend: 'For upcoming IPL 2024',
-    color: 'text-yellow-600 dark:text-yellow-400',
-    bgColor: 'bg-yellow-100 dark:bg-yellow-900/30'
-  },
-  {
-    name: 'Next Event In',
-    value: '4 Days',
-    icon: IconCalendarEvent,
-    trend: 'WPL Mini Auction',
-    color: 'text-purple-600 dark:text-purple-400',
-    bgColor: 'bg-purple-100 dark:bg-purple-900/30'
-  }
-];
+import { useState, useEffect } from 'react';
+import { useSettings } from '../../../../context/SettingsContext';
+import { useAuth } from '../../../../context/AuthContext';
+import api from '../../../../utils/api';
 
 const ClientStatCards = () => {
+  const { currencySymbol } = useSettings();
+  const { user } = useAuth();
+  const [teamData, setTeamData] = useState(null);
+  const [nextEvent, setNextEvent] = useState('TBD');
+  const [shortlisted, setShortlisted] = useState('0');
+  const [actualSquadSize, setActualSquadSize] = useState(0);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!user?.email) return;
+      try {
+        // Fetch team
+        const res = await api.get('/teams');
+        const myTeam = res.data.find(t => t.ownerEmail?.toLowerCase() === user.email?.toLowerCase());
+        if (myTeam) {
+          setTeamData(myTeam);
+          
+          // Fetch players for squad size
+          const playersRes = await api.get(`/players?teamId=${myTeam.id}`);
+          setActualSquadSize(playersRes.data.length);
+        }
+
+        // Fetch auctions for Next Event
+        const auctionsRes = await api.get('/auctions');
+        const activeOrUpcoming = auctionsRes.data.filter(a => a.status === 'UPCOMING' || a.status === 'ACTIVE' || !a.status);
+        if (activeOrUpcoming.length > 0) {
+          const next = activeOrUpcoming[0];
+          setNextEvent(next.date ? new Date(next.date).toLocaleDateString() : 'TBD');
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+      }
+    };
+    fetchDashboardData();
+  }, [user]);
+
+  const purse = teamData?.purse || '0';
+  const formattedPurse = parseFloat(purse.toString().replace(/[^0-9.]/g, '') || 0).toLocaleString();
+  const squadSize = teamData?.squadSize || 0;
+
+  const stats = [
+    {
+      name: 'Remaining Purse',
+      value: `${currencySymbol}${formattedPurse}`,
+      icon: IconWallet,
+      trend: `Available budget`,
+      color: 'text-green-600 dark:text-green-400',
+      bgColor: 'bg-green-100 dark:bg-green-900/30'
+    },
+    {
+      name: 'Squad Size',
+      value: actualSquadSize.toString(),
+      icon: IconUsers,
+      trend: `Max ${squadSize || 25} players`,
+      color: 'text-primary-600 dark:text-primary-400',
+      bgColor: 'bg-primary-100 dark:bg-primary-900/30'
+    },
+    {
+      name: 'Shortlisted Players',
+      value: shortlisted,
+      icon: IconStar,
+      trend: 'For upcoming events',
+      color: 'text-yellow-600 dark:text-yellow-400',
+      bgColor: 'bg-yellow-100 dark:bg-yellow-900/30'
+    },
+    {
+      name: 'Next Event In',
+      value: nextEvent,
+      icon: IconCalendarEvent,
+      trend: 'Upcoming Auction',
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-100 dark:bg-purple-900/30'
+    }
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (

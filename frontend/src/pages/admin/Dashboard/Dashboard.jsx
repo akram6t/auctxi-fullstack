@@ -2,8 +2,50 @@ import StatCards from './components/StatCards';
 import RevenueChart from './components/RevenueChart';
 import RecentActivityTable from './components/RecentActivityTable';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import api from '../../../utils/api';
 
 const Dashboard = () => {
+  const generateReport = async () => {
+    try {
+      const toastId = toast.loading('Generating report...');
+      
+      // Fetch fresh data for the report
+      const statsRes = await api.get('/dashboard/stats');
+      const actRes = await api.get('/dashboard/activities');
+      
+      const stats = statsRes.data;
+      const activities = actRes.data;
+      
+      let csvContent = "AuctXI System Overview Report\n";
+      csvContent += `Generated at: ${new Date().toLocaleString()}\n\n`;
+      
+      csvContent += "--- Key Metrics ---\n";
+      csvContent += `Total Teams,${stats.totalTeams}\n`;
+      csvContent += `Total Players,${stats.totalPlayers}\n`;
+      csvContent += `Total Users,${stats.totalUsers}\n\n`;
+      
+      csvContent += "--- Recent Activity ---\n";
+      csvContent += "Time,Type,Description\n";
+      activities.forEach(act => {
+        csvContent += `"${new Date(act.time).toLocaleString()}","${act.type}","${act.description.replace(/"/g, '""')}"\n`;
+      });
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `auctxi_system_report_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.update(toastId, { render: "Report generated successfully!", type: "success", isLoading: false, autoClose: 3000 });
+    } catch (error) {
+      console.error("Failed to generate report", error);
+      toast.error('Failed to generate report. Please try again.');
+    }
+  };
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -16,7 +58,10 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+          <button 
+            onClick={generateReport}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+          >
             Generate Report
           </button>
         </div>

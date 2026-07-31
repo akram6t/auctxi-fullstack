@@ -38,14 +38,7 @@ const Sidebar = () => {
           { name: 'Players', path: '/manager/players', icon: IconRun },
           { name: 'Payments', path: '/manager/payments', icon: IconReceipt2 },
           { name: 'Reports', path: '/manager/reports', icon: IconReportAnalytics },
-        ];
-      case 'client':
-        return [
-          { name: 'Dashboard', path: '/client/dashboard', icon: IconDashboard },
-          { name: 'Auctions', path: '/client/auctions', icon: IconGavel },
-          { name: 'Players', path: '/client/players', icon: IconRun },
-          { name: 'Payments', path: '/client/payments', icon: IconReceipt2 },
-          { name: 'Profile', path: '/client/profile', icon: IconUser },
+          { name: 'Settings', path: '/manager/settings', icon: IconSettings },
         ];
       default:
         return [];

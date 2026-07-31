@@ -1,4 +1,5 @@
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const data = [
   { name: 'Jan', revenue: 4000 },
@@ -11,6 +12,7 @@ const data = [
 ];
 
 const RevenueChart = () => {
+  const { currencySymbol } = useSettings();
   return (
     <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden p-6">
       <h3 className="text-lg leading-6 font-semibold text-secondary-900 dark:text-white mb-6">
@@ -44,10 +46,11 @@ const RevenueChart = () => {
             <YAxis 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: '#94a3b8', fontSize: 12 }}
-              tickFormatter={(value) => `$${value}`}
+              stroke="var(--color-secondary-400)" 
+              fontSize={12}
+              tickFormatter={(value) => `${currencySymbol}${value}`}
             />
-            <Tooltip 
+            <RechartsTooltip 
               contentStyle={{ 
                 backgroundColor: 'var(--color-secondary-900)', 
                 borderColor: 'var(--color-secondary-800)',

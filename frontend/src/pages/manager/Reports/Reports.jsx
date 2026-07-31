@@ -1,7 +1,40 @@
+import { useState, useEffect } from 'react';
 import { IconDownload } from '@tabler/icons-react';
 import EventPerformanceReport from './components/EventPerformanceReport';
+import { useSettings } from '../../../context/SettingsContext';
+import api from '../../../utils/api';
+import { toast } from 'react-toastify';
 
 const Reports = () => {
+  const { currencySymbol } = useSettings();
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchSummary = async () => {
+          try {
+              const res = await api.get('/reports/summary');
+              setSummary(res.data);
+          } catch (err) {
+              console.error(err);
+              toast.error('Failed to load report summary');
+          } finally {
+              setLoading(false);
+          }
+      };
+      fetchSummary();
+  }, []);
+
+  const totalSpent = summary?.totalMoneySpent ? summary.totalMoneySpent : '$0M';
+  const playersSold = summary?.totalPlayersSold || 0;
+  
+  // Parse total spent string to calculate average (e.g. "$4.5M" -> 4500000)
+  let avgPrice = 0;
+  if (playersSold > 0 && summary?.totalMoneySpent) {
+      const cleanNum = parseFloat(summary.totalMoneySpent.replace(/[^0-9.]/g, ''));
+      const totalAmount = cleanNum * 1000000;
+      avgPrice = Math.round(totalAmount / playersSold);
+  }
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -30,17 +63,23 @@ const Reports = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
-        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
-          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Total Revenue Generated</dt>
-          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">$65.5M</dd>
+        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 p-5">
+          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Total Player Spend</dt>
+          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">
+              {loading ? '-' : totalSpent.replace('$', currencySymbol)}
+          </dd>
         </div>
         <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
           <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Players Sold</dt>
-          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">142</dd>
+          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">
+              {loading ? '-' : playersSold}
+          </dd>
         </div>
-        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
-          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Avg. Sell Price</dt>
-          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">$461K</dd>
+        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 p-5">
+          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Avg Player Price</dt>
+          <dd className="mt-1 text-3xl font-semibold text-secondary-900 dark:text-white">
+              {loading ? '-' : `${currencySymbol}${avgPrice.toLocaleString()}`}
+          </dd>
         </div>
       </div>
 

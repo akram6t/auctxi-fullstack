@@ -6,6 +6,7 @@ import { IconX } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
 import ImageUpload from '../../../../components/ui/ImageUpload';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const playerSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -15,7 +16,8 @@ const playerSchema = z.object({
   status: z.string().optional(),
 });
 
-const EditPlayerModal = ({ player, onClose, onSave }) => {
+const EditPlayerModal = ({ player, isOpen, onClose, onPlayerUpdated }) => {
+  const { currencySymbol } = useSettings();
   const [imageUrl, setImageUrl] = useState('');
   
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -31,25 +33,35 @@ const EditPlayerModal = ({ player, onClose, onSave }) => {
 
   useEffect(() => {
     if (player) {
+      let parsedPrice = 50000;
+      if (player.basePrice) {
+          const num = parseInt(String(player.basePrice).replace(/[^0-9]/g, ''), 10);
+          if (!isNaN(num)) parsedPrice = num;
+      }
+      
       reset({
         name: player.name,
         country: player.country,
         role: player.role,
-        basePrice: player.basePrice,
+        basePrice: parsedPrice,
         status: player.status || 'Available',
       });
       setImageUrl(player.imageUrl || '');
     }
   }, [player, reset]);
 
-  if (!player) return null;
+  if (!player || !isOpen) return null;
 
   const onSubmit = async (data) => {
     try {
-      const payload = { ...data, imageUrl };
+      const payload = { 
+          ...data, 
+          imageUrl,
+          basePrice: data.basePrice.toString() // backend expects a string
+      };
       await api.put(`/players/${player.id}`, payload);
       toast.success('Player ' + data.name + ' updated successfully!');
-      if (onSave) onSave();
+      if (onPlayerUpdated) onPlayerUpdated();
       onClose();
     } catch (error) {
       console.error("Failed to update player", error);
@@ -130,7 +142,7 @@ const EditPlayerModal = ({ player, onClose, onSave }) => {
               <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">Base Price</label>
               <div className="relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-secondary-500 sm:text-sm">$</span>
+                  <span className="text-secondary-500 sm:text-sm">{currencySymbol}</span>
                 </div>
                 <input
                   {...register('basePrice', { valueAsNumber: true })} 

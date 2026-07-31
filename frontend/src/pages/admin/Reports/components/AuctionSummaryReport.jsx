@@ -2,8 +2,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, L
 import { IconTrophy, IconUserOff, IconCurrencyDollar } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import api from '../../../../utils/api';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const AuctionSummaryReport = () => {
+  const { currencySymbol } = useSettings();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +27,7 @@ const AuctionSummaryReport = () => {
     return <div className="py-10 text-center text-sm text-secondary-500">Loading summary...</div>;
   }
 
-  const { pieData = [], topBuys = [], totalPlayersSold = 0, unsoldPlayers = 0, totalMoneySpent = "$0M" } = data || {};
+  const { pieData = [], topBuys = [], totalPlayersSold = 0, unsoldPlayers = 0, totalMoneySpent = `${currencySymbol}0M` } = data || {};
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -51,7 +53,7 @@ const AuctionSummaryReport = () => {
             <IconCurrencyDollar size={24} />
           </div>
           <h3 className="text-sm font-medium text-secondary-500 dark:text-secondary-400">Total Money Spent</h3>
-          <p className="text-3xl font-bold text-secondary-900 dark:text-white mt-1">{totalMoneySpent}</p>
+          <p className="text-3xl font-bold text-secondary-900 dark:text-white mt-1">{totalMoneySpent.replace('$', currencySymbol)}</p>
         </div>
       </div>
 
@@ -110,7 +112,7 @@ const AuctionSummaryReport = () => {
                   </div>
                   <div>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                      {buy.price}
+                      {buy.price.replace('$', currencySymbol)}
                     </span>
                   </div>
                 </li>

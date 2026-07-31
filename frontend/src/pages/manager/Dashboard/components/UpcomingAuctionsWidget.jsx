@@ -1,11 +1,11 @@
 import { IconCalendar, IconMapPin } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 
-const upcomingAuctions = [
-  { id: 1, name: 'IPL Mega Auction 2025', date: 'Dec 15, 2024', time: '10:00 AM', location: 'Dubai, UAE', status: 'Scheduled' },
-  { id: 2, name: 'WPL Mini Auction', date: 'Jan 10, 2025', time: '14:00 PM', location: 'Mumbai, India', status: 'Drafting' },
-];
+const UpcomingAuctionsWidget = ({ auctions = [], loading = false }) => {
+  const navigate = useNavigate();
+  // Filter for upcoming/scheduled auctions
+  const upcomingAuctions = auctions.filter(a => a.status === 'UPCOMING' || a.status === 'Scheduled' || a.status === 'Upcoming');
 
-const UpcomingAuctionsWidget = () => {
   return (
     <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 h-full flex flex-col">
       <div className="px-6 py-5 border-b border-secondary-200 dark:border-secondary-800">
@@ -38,13 +38,21 @@ const UpcomingAuctionsWidget = () => {
                 </div>
               </div>
               <div className="mt-4">
-                 <button className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors">
+                 <button 
+                    onClick={() => navigate('/manager/auctions')}
+                    className="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 transition-colors"
+                 >
                   Prepare Console &rarr;
                  </button>
               </div>
             </li>
           ))}
-          {upcomingAuctions.length === 0 && (
+          {loading && (
+            <li className="p-6 text-center text-sm text-secondary-500 dark:text-secondary-400">
+              Loading upcoming events...
+            </li>
+          )}
+          {!loading && upcomingAuctions.length === 0 && (
             <li className="p-6 text-center text-sm text-secondary-500 dark:text-secondary-400">
               No upcoming auctions assigned.
             </li>

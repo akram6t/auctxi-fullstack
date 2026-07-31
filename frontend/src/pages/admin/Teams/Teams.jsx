@@ -4,8 +4,10 @@ import { toast } from 'react-toastify';
 import api from '../../../utils/api';
 import TeamGrid from './components/TeamGrid';
 import CreateTeamForm from './components/CreateTeamForm';
+import { useSettings } from '../../../context/SettingsContext';
 
-const Teams = () => {
+const AdminTeams = () => {
+  const { currencySymbol } = useSettings();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,9 +69,9 @@ const Teams = () => {
           <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Active Teams</dt>
           <dd className="mt-1 text-3xl font-semibold text-green-600">{loading ? '...' : activeTeams}</dd>
         </div>
-        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 px-4 py-5 sm:p-6 text-center">
-          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Total Purse Allocated</dt>
-          <dd className="mt-1 text-3xl font-semibold text-primary-600">{loading ? '...' : `${totalPurse} Cr`}</dd>
+        <div className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 p-5 border-l-4 border-l-primary-500">
+          <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">Total Franchise Purse</dt>
+          <dd className="mt-1 text-3xl font-semibold text-primary-600">{loading ? '...' : `${currencySymbol}${totalPurse}`}</dd>
         </div>
       </div>
 
@@ -97,4 +99,4 @@ const Teams = () => {
   );
 };
 
-export default Teams;
+export default AdminTeams;

@@ -1,6 +1,7 @@
 import { useAuth } from '../../context/AuthContext';
-import { IconLogout, IconUserCircle, IconBell, IconSearch, IconUserShield } from '@tabler/icons-react';
+import { IconLogout, IconUserCircle, IconSearch, IconUserShield } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import NotificationPanel from './NotificationPanel';
 
 const Topbar = () => {
   const { user, login, logout } = useAuth();
@@ -8,15 +9,6 @@ const Topbar = () => {
   const handleLogout = () => {
     logout();
     navigate('/auth/login');
-  };
-
-  const handleRoleSwitch = (e) => {
-    const newRole = e.target.value;
-    if (newRole && user) {
-      // Mock switching roles
-      login({ ...user, role: newRole });
-      navigate(`/${newRole}/dashboard`);
-    }
   };
 
   return (
@@ -33,28 +25,10 @@ const Topbar = () => {
           />
         </div>
 
-        {/* Dev Tool: Role Switcher */}
-        {user && (
-          <div className="hidden lg:flex items-center gap-2 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-lg border border-primary-100 dark:border-primary-800/50">
-            <IconUserShield size={16} className="text-primary-600 dark:text-primary-400" />
-            <select 
-              value={user.role} 
-              onChange={handleRoleSwitch}
-              className="bg-transparent text-xs font-semibold text-primary-700 dark:text-primary-300 focus:outline-none cursor-pointer"
-            >
-              <option value="admin">Admin View</option>
-              <option value="manager">Manager View</option>
-              <option value="client">Client View</option>
-            </select>
-          </div>
-        )}
       </div>
       
       <div className="flex items-center gap-4">
-        <button className="p-2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300 transition-colors relative">
-          <IconBell size={22} stroke={1.5} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        <NotificationPanel />
         
         <div className="h-8 w-px bg-secondary-200 dark:bg-secondary-700 mx-2"></div>
         

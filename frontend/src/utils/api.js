@@ -7,9 +7,19 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to automatically inject the JWT token
+// Add a request interceptor to automatically inject the JWT token and route paths
 api.interceptors.request.use(
   (config) => {
+    // Route to /payment for payment-related endpoints, /notification for notification, otherwise /auction
+    if (config.url.startsWith('/payments')) {
+      config.url = '/payment' + config.url;
+    } else if (config.url.startsWith('/notification')) {
+      // API Gateway maps /api/notification to port 4000
+      // So we just keep the url as is if the component calls it with /notification/messages
+    } else {
+      config.url = '/auction' + config.url;
+    }
+
     // Prioritize sessionStorage (current session) over localStorage (persisted)
     const userStr = sessionStorage.getItem('auctxi_user') || localStorage.getItem('auctxi_user');
     if (userStr) {

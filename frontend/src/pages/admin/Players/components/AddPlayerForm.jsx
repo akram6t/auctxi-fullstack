@@ -5,6 +5,7 @@ import { IconX } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
 import { useState } from 'react';
+import { useSettings } from '../../../../context/SettingsContext';
 import ImageUpload from '../../../../components/ui/ImageUpload';
 
 const playerSchema = z.object({
@@ -15,6 +16,7 @@ const playerSchema = z.object({
 });
 
 const AddPlayerForm = ({ isOpen, onClose, onSave }) => {
+  const { currencySymbol } = useSettings();
   const [imageUrl, setImageUrl] = useState('');
   
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -29,7 +31,11 @@ const AddPlayerForm = ({ isOpen, onClose, onSave }) => {
 
   const onSubmit = async (data) => {
     try {
-      const payload = { ...data, imageUrl };
+      const payload = { 
+          ...data, 
+          imageUrl,
+          basePrice: data.basePrice.toString()
+      };
       await api.post('/players', payload);
       toast.success('Player ' + data.name + ' added to pool!');
       if (onSave) onSave();
@@ -104,7 +110,7 @@ const AddPlayerForm = ({ isOpen, onClose, onSave }) => {
             <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">Base Price</label>
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-secondary-500 sm:text-sm">$</span>
+                <span className="text-secondary-500 sm:text-sm">{currencySymbol}</span>
               </div>
               <input
                 {...register('basePrice', { valueAsNumber: true })} 

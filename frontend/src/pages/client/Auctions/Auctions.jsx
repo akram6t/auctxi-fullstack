@@ -4,9 +4,10 @@ import BiddingTerminal from './components/BiddingTerminal';
 
 const Auctions = () => {
   const [view, setView] = useState('list'); // 'list' | 'live'
+  const [activeAuctionId, setActiveAuctionId] = useState(null);
 
-  if (view === 'live') {
-    return <BiddingTerminal onExit={() => setView('list')} />;
+  if (view === 'live' && activeAuctionId) {
+    return <BiddingTerminal auctionId={activeAuctionId} onExit={() => setView('list')} />;
   }
 
   return (
@@ -22,7 +23,10 @@ const Auctions = () => {
         </div>
       </div>
 
-      <RegisteredAuctionsTable onEnterLive={() => setView('live')} />
+      <RegisteredAuctionsTable onEnterLive={(id) => {
+        setActiveAuctionId(id);
+        setView('live');
+      }} />
     </div>
   );
 };

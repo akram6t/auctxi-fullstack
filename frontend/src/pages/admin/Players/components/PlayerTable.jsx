@@ -3,8 +3,10 @@ import { toast } from 'react-toastify';
 import api from '../../../../utils/api';
 import { useState } from 'react';
 import EditPlayerModal from './EditPlayerModal';
+import { useSettings } from '../../../../context/SettingsContext';
 
 const PlayerTable = ({ players, setPlayers, loading, onRefresh }) => {
+  const { currencySymbol } = useSettings();
   const [editPlayer, setEditPlayer] = useState(null);
 
   const handleDelete = async (id, name) => {
@@ -76,8 +78,8 @@ const PlayerTable = ({ players, setPlayers, loading, onRefresh }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-secondary-900 dark:text-white">{player.role}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-secondary-900 dark:text-white">
-                  {player.basePrice}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900 dark:text-white font-medium">
+                  {currencySymbol}{player.basePrice}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col items-start gap-1">
@@ -141,8 +143,9 @@ const PlayerTable = ({ players, setPlayers, loading, onRefresh }) => {
 
       <EditPlayerModal 
         player={editPlayer}
+        isOpen={!!editPlayer}
         onClose={() => setEditPlayer(null)}
-        onSave={onRefresh}
+        onPlayerUpdated={onRefresh}
       />
     </div>
   );

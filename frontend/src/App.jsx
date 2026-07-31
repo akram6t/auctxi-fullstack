@@ -1,9 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SettingsProvider } from './context/SettingsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
+import ClientLayout from './components/layout/ClientLayout';
 import Login from './pages/auth/Login/Login';
 import Signup from './pages/auth/Signup/Signup';
+import ThemeToggle from './components/ThemeToggle';
+import ChatbotWidget from './components/chatbot/ChatbotWidget';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard/Dashboard';
@@ -22,6 +26,7 @@ import ManagerAuctions from './pages/manager/Auctions/Auctions';
 import ManagerPlayers from './pages/manager/Players/Players';
 import ManagerPayments from './pages/manager/Payments/Payments';
 import ManagerReports from './pages/manager/Reports/Reports';
+import ManagerSettings from './pages/manager/Settings/Settings';
 
 // Client Pages
 import ClientDashboard from './pages/client/Dashboard/Dashboard';
@@ -36,8 +41,9 @@ import 'react-toastify/dist/ReactToastify.css';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+      <SettingsProvider>
+        <BrowserRouter>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Navigate to="/auth/login" replace />} />
           <Route path="/auth/login" element={<Login />} />
@@ -68,12 +74,13 @@ function App() {
               <Route path="players" element={<ManagerPlayers />} />
               <Route path="payments" element={<ManagerPayments />} />
               <Route path="reports" element={<ManagerReports />} />
+              <Route path="settings" element={<ManagerSettings />} />
             </Route>
           </Route>
 
           {/* Client Routes */}
           <Route element={<ProtectedRoute allowedRoles={['client']} />}>
-            <Route path="/client" element={<DashboardLayout />}>
+            <Route path="/client" element={<ClientLayout />}>
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<ClientDashboard />} />
               <Route path="auctions" element={<ClientAuctions />} />
@@ -87,6 +94,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </SettingsProvider>
       <ToastContainer 
         position="bottom-right"
         autoClose={3000}
@@ -99,6 +107,8 @@ function App() {
         pauseOnHover
         theme="dark"
       />
+      <ThemeToggle />
+      <ChatbotWidget />
     </AuthProvider>
   );
 }

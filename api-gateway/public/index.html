@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuctXI API Gateway Status</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; color: #1e293b; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { color: #2563eb; }
+        .service { padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .service .name { font-weight: 600; font-size: 1.1rem; }
+        .service .port { color: #64748b; font-family: monospace; }
+        .status { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+        .status.running { background: #dcfce7; color: #166534; }
+        .status.unknown { background: #fef08a; color: #854d0e; }
+        .status.down { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AuctXI API Gateway</h1>
+        <p>This gateway routes traffic between the Frontend and the backend microservices.</p>
+        
+        <h2>Running Services</h2>
+        
+        <div class="service">
+            <div>
+                <div class="name">Node.js API Gateway</div>
+                <div class="port">Port: 3000 | Route: /*</div>
+            </div>
+            <div id="status-gateway" class="status running">Running</div>
+        </div>
+
+        <div class="service">
+            <div>
+                <div class="name">Java Spring Boot Backend</div>
+                <div class="port">Port: 8080 | Route: /api/*</div>
+            </div>
+            <div id="status-java" class="status unknown">Checking...</div>
+        </div>
+
+        <div class="service">
+            <div>
+                <div class="name">Python Chatbot Service</div>
+                <div class="port">Port: 5000 | Route: /api/chat/*</div>
+            </div>
+            <div id="status-python" class="status unknown">Checking...</div>
+        </div>
+
+        <div class="service">
+            <div>
+                <div class="name">.NET Payment Service</div>
+                <div class="port">Port: 5001 | Route: /api/payment/*</div>
+            </div>
+            <div id="status-payment" class="status unknown">Checking...</div>
+        </div>
+
+        <div class="service">
+            <div>
+                <div class="name">Node.js Notification Server</div>
+                <div class="port">Port: 4000 | Route: /api/notification/*</div>
+            </div>
+            <div id="status-notification" class="status unknown">Checking...</div>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus(id, isRunning) {
+            const el = document.getElementById(id);
+            if (isRunning) {
+                el.className = 'status running';
+                el.textContent = 'Running';
+            } else {
+                el.className = 'status down';
+                el.textContent = 'Down';
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                updateStatus('status-gateway', data.gateway);
+                updateStatus('status-java', data.java);
+                updateStatus('status-python', data.python);
+                updateStatus('status-payment', data.payment);
+                updateStatus('status-notification', data.notification);
+            } catch (err) {
+                console.error("Failed to fetch status", err);
+                updateStatus('status-gateway', false);
+                updateStatus('status-java', false);
+                updateStatus('status-python', false);
+                updateStatus('status-payment', false);
+                updateStatus('status-notification', false);
+            }
+        }
+
+        // Fetch immediately, then every 2 seconds
+        fetchStatus();
+        setInterval(fetchStatus, 2000);
+    </script>
+</body>
+</html>
