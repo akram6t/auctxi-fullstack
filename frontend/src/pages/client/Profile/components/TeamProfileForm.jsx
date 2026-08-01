@@ -144,21 +144,21 @@ const TeamProfileForm = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 p-6">
+    <div className="bg-white/70 dark:bg-secondary-900/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl border border-white/40 dark:border-secondary-800/60 p-8">
       <form onSubmit={handleSubmit} className="space-y-8">
         
         {/* Branding Section */}
         <div>
-          <h3 className="text-lg leading-6 font-medium text-secondary-900 dark:text-white">Franchise Branding</h3>
-          <p className="mt-1 text-sm text-secondary-500 dark:text-secondary-400">
+          <h3 className="text-xl font-bold text-secondary-900 dark:text-white">Franchise Branding</h3>
+          <p className="mt-1 text-sm font-medium text-secondary-500 dark:text-secondary-400">
             This information will be displayed publicly during live auctions.
           </p>
           
           <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-6">
-              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">Team Logo</label>
+              <label className="block text-sm font-bold text-secondary-700 dark:text-secondary-300 mb-2">Team Logo</label>
               <div className="mt-2 flex items-center">
-                <span className="h-20 w-20 rounded-full overflow-hidden bg-secondary-100 dark:bg-secondary-800 border-2 border-secondary-200 dark:border-secondary-700 flex items-center justify-center">
+                <span className="h-24 w-24 rounded-3xl overflow-hidden bg-secondary-100 dark:bg-secondary-800/50 border-2 border-white dark:border-secondary-700 shadow-md flex items-center justify-center">
                   {previewUrl ? (
                     <img src={previewUrl} alt="Team Logo" className="h-full w-full object-cover" />
                   ) : (
@@ -174,66 +174,66 @@ const TeamProfileForm = () => {
                   onChange={handleLogoChange}
                   className="hidden" 
                 />
-                <button type="button" onClick={handleLogoClick} className="ml-5 bg-white dark:bg-secondary-800 py-2.5 px-4 border border-secondary-300 dark:border-secondary-700 rounded-lg shadow-sm text-sm leading-4 font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center gap-2">
-                  <IconUpload size={16} /> Change Logo
+                <button type="button" onClick={handleLogoClick} className="ml-6 bg-white dark:bg-secondary-800 py-3 px-5 border border-secondary-200 dark:border-secondary-700 rounded-xl shadow-sm text-sm font-bold text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                  <IconUpload size={18} /> Change Logo
                 </button>
               </div>
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="name" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
+              <label htmlFor="name" className="block text-sm font-bold text-secondary-700 dark:text-secondary-300 mb-2">
                 Franchise Name
               </label>
               <div className="mt-1">
-                <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} className="appearance-none block w-full px-3 py-2.5 border border-secondary-300 dark:border-secondary-700 placeholder-secondary-400 text-secondary-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-secondary-800 transition-shadow" />
+                <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} className="appearance-none block w-full px-4 py-3.5 border-none shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder-secondary-400 text-secondary-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 sm:text-base bg-secondary-50 dark:bg-secondary-800/50 transition-all font-semibold" />
               </div>
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="shortName" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
+              <label htmlFor="shortName" className="block text-sm font-bold text-secondary-700 dark:text-secondary-300 mb-2">
                 Abbreviation (Short Name)
               </label>
               <div className="mt-1">
-                <input type="text" id="shortName" name="shortName" value={formData.shortName} onChange={handleChange} className="appearance-none block w-full px-3 py-2.5 border border-secondary-300 dark:border-secondary-700 placeholder-secondary-400 text-secondary-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-secondary-800 transition-shadow uppercase" />
+                <input type="text" id="shortName" name="shortName" value={formData.shortName} onChange={handleChange} className="appearance-none block w-full px-4 py-3.5 border-none shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder-secondary-400 text-secondary-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 sm:text-base bg-secondary-50 dark:bg-secondary-800/50 transition-all uppercase font-bold" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Contact Section */}
-        <div className="pt-8 border-t border-secondary-200 dark:border-secondary-800">
-          <h3 className="text-lg leading-6 font-medium text-secondary-900 dark:text-white">Manager Contact Details</h3>
-          <p className="mt-1 text-sm text-secondary-500 dark:text-secondary-400">
+        <div className="pt-8 border-t border-secondary-200/50 dark:border-secondary-800/50">
+          <h3 className="text-xl font-bold text-secondary-900 dark:text-white">Manager Contact Details</h3>
+          <p className="mt-1 text-sm font-medium text-secondary-500 dark:text-secondary-400">
             Primary contact for billing and event updates.
           </p>
           
           <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
             <div className="sm:col-span-3">
-              <label htmlFor="ownerName" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
+              <label htmlFor="ownerName" className="block text-sm font-bold text-secondary-700 dark:text-secondary-300 mb-2">
                 Full Name
               </label>
               <div className="mt-1">
-                <input type="text" id="ownerName" name="ownerName" value={formData.ownerName} onChange={handleChange} className="appearance-none block w-full px-3 py-2.5 border border-secondary-300 dark:border-secondary-700 placeholder-secondary-400 text-secondary-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-secondary-800 transition-shadow" />
+                <input type="text" id="ownerName" name="ownerName" value={formData.ownerName} onChange={handleChange} className="appearance-none block w-full px-4 py-3.5 border-none shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder-secondary-400 text-secondary-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 sm:text-base bg-secondary-50 dark:bg-secondary-800/50 transition-all font-medium" />
               </div>
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="ownerEmail" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-1">
+              <label htmlFor="ownerEmail" className="block text-sm font-bold text-secondary-700 dark:text-secondary-300 mb-2">
                 Email Address
               </label>
               <div className="mt-1">
-                <input type="email" id="ownerEmail" name="ownerEmail" value={formData.ownerEmail} onChange={handleChange} className="appearance-none block w-full px-3 py-2.5 border border-secondary-300 dark:border-secondary-700 placeholder-secondary-400 text-secondary-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white dark:bg-secondary-800 transition-shadow" />
+                <input type="email" id="ownerEmail" name="ownerEmail" value={formData.ownerEmail} onChange={handleChange} className="appearance-none block w-full px-4 py-3.5 border-none shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder-secondary-400 text-secondary-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 sm:text-base bg-secondary-50 dark:bg-secondary-800/50 transition-all font-medium" />
               </div>
             </div>
           </div>
         </div>
         
         {/* Submit */}
-        <div className="pt-5 border-t border-secondary-200 dark:border-secondary-800 flex justify-end">
-          <button type="button" className="bg-white dark:bg-secondary-800 py-2 px-4 border border-secondary-300 dark:border-secondary-700 rounded-md shadow-sm text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 mr-3 transition-colors">
+        <div className="pt-6 border-t border-secondary-200/50 dark:border-secondary-800/50 flex justify-end">
+          <button type="button" className="bg-white dark:bg-secondary-800 py-3 px-6 border border-secondary-200 dark:border-secondary-700 rounded-xl shadow-sm text-sm font-bold text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none transition-all mr-4 hover:-translate-y-0.5">
             Cancel
           </button>
-          <button type="submit" disabled={saving} className="inline-flex justify-center items-center gap-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors disabled:opacity-50">
+          <button type="submit" disabled={saving} className="inline-flex justify-center items-center gap-2 py-3 px-6 shadow-md hover:shadow-lg text-sm font-bold rounded-xl text-white bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 focus:outline-none transition-all hover:-translate-y-0.5 disabled:opacity-50">
             {saving ? <IconLoader2 size={18} className="animate-spin" /> : <IconDeviceFloppy size={18} />}
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

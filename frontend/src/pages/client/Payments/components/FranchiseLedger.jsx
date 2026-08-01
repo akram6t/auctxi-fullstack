@@ -54,13 +54,13 @@ const FranchiseLedger = () => {
     };
   }, [user]);
   return (
-    <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 overflow-hidden">
-      <div className="px-6 py-5 border-b border-secondary-200 dark:border-secondary-800 flex justify-between items-center">
-        <h3 className="text-lg leading-6 font-semibold text-secondary-900 dark:text-white">Transaction Ledger</h3>
+    <div className="bg-white/70 dark:bg-secondary-900/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl border border-white/40 dark:border-secondary-800/60 overflow-hidden">
+      <div className="px-6 py-5 border-b border-secondary-200/50 dark:border-secondary-800/50 flex justify-between items-center bg-white/50 dark:bg-secondary-900/50">
+        <h3 className="text-lg leading-6 font-bold text-secondary-900 dark:text-white">Transaction Ledger</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-secondary-200 dark:divide-secondary-800">
-          <thead className="bg-secondary-50 dark:bg-secondary-800/50">
+          <thead className="bg-secondary-50/50 dark:bg-secondary-800/30">
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">Date & ID</th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">Description</th>
@@ -68,7 +68,7 @@ const FranchiseLedger = () => {
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-secondary-900 divide-y divide-secondary-200 dark:divide-secondary-800">
+          <tbody className="divide-y divide-secondary-100 dark:divide-secondary-800/50">
             {loading ? (
               <tr>
                 <td colSpan="4" className="px-6 py-4 text-center text-sm text-secondary-500">
@@ -82,14 +82,14 @@ const FranchiseLedger = () => {
                 </td>
               </tr>
             ) : ledgerData.map((item) => (
-              <tr key={item.id} className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors">
+              <tr key={item.id} className="hover:bg-secondary-50/80 dark:hover:bg-secondary-800/40 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-semibold text-secondary-900 dark:text-white">{item.date}</div>
                   <div className="text-xs text-secondary-500">{item.id}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-secondary-900 dark:text-white font-medium">{item.type}</div>
-                  <div className="text-xs text-secondary-500">{item.event} {item.player !== '-' && `• ${item.player}`}</div>
+                  <div className="text-sm text-secondary-900 dark:text-white font-bold">{item.type}</div>
+                  <div className="text-xs font-medium text-secondary-500 mt-0.5">{item.event} {item.player !== '-' && `• ${item.player}`}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                    <div className={`flex items-center gap-1 text-sm font-bold ${item.isCredit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -98,10 +98,10 @@ const FranchiseLedger = () => {
                    </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2.5 py-1 inline-flex items-center gap-1 text-xs leading-5 font-semibold rounded-full ${
-                    item.status === 'Success' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                    item.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                  <span className={`px-2.5 py-1 inline-flex items-center gap-1 text-[10px] leading-4 font-bold rounded-full uppercase tracking-wider ${
+                    item.status === 'Success' ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' :
+                    item.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300' :
+                    'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
                   }`}>
                     {item.status === 'Success' && <IconCheck size={12} />}
                     {item.status === 'Pending' && <IconClockHour4 size={12} />}

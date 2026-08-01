@@ -51,53 +51,56 @@ const ClientStatCards = () => {
       value: `${currencySymbol}${formattedPurse}`,
       icon: IconWallet,
       trend: `Available budget`,
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900/30'
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-green-400 to-green-600 shadow-green-500/30 shadow-lg'
     },
     {
       name: 'Squad Size',
       value: actualSquadSize.toString(),
       icon: IconUsers,
       trend: `Max ${squadSize || 25} players`,
-      color: 'text-primary-600 dark:text-primary-400',
-      bgColor: 'bg-primary-100 dark:bg-primary-900/30'
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-primary-500 to-blue-600 shadow-primary-500/30 shadow-lg'
     },
     {
       name: 'Shortlisted Players',
       value: shortlisted,
       icon: IconStar,
       trend: 'For upcoming events',
-      color: 'text-yellow-600 dark:text-yellow-400',
-      bgColor: 'bg-yellow-100 dark:bg-yellow-900/30'
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-yellow-400 to-orange-500 shadow-orange-500/30 shadow-lg'
     },
     {
       name: 'Next Event In',
       value: nextEvent,
       icon: IconCalendarEvent,
       trend: 'Upcoming Auction',
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-100 dark:bg-purple-900/30'
+      color: 'text-white',
+      bgColor: 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-purple-500/30 shadow-lg'
     }
   ];
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
-        <div key={stat.name} className="bg-white dark:bg-secondary-900 overflow-hidden shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 transition-all hover:shadow-md">
-          <div className="p-5">
+        <div 
+          key={stat.name} 
+          className="group relative bg-white/70 dark:bg-secondary-900/70 backdrop-blur-xl overflow-hidden rounded-3xl border border-white/40 dark:border-secondary-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1"
+        >
+          <div className="p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} aria-hidden="true" />
+                <div className={`p-3.5 rounded-2xl ${stat.bgColor} transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                  <stat.icon className={`h-6 w-6 ${stat.color}`} stroke={2} aria-hidden="true" />
                 </div>
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-secondary-500 dark:text-secondary-400 truncate">
+                  <dt className="text-sm font-semibold text-secondary-500 dark:text-secondary-400 truncate">
                     {stat.name}
                   </dt>
                   <dd>
-                    <div className="text-2xl font-bold text-secondary-900 dark:text-white">
+                    <div className="text-2xl font-black text-secondary-900 dark:text-white tracking-tight mt-1">
                       {stat.value}
                     </div>
                   </dd>
@@ -105,8 +108,8 @@ const ClientStatCards = () => {
               </div>
             </div>
           </div>
-          <div className="bg-secondary-50 dark:bg-secondary-800/50 px-5 py-3 border-t border-secondary-200 dark:border-secondary-800">
-            <div className="text-sm text-secondary-500 dark:text-secondary-400">
+          <div className="bg-secondary-50/50 dark:bg-secondary-800/30 px-6 py-3.5 border-t border-secondary-200/50 dark:border-secondary-800/50">
+            <div className="text-sm font-medium text-secondary-500 dark:text-secondary-400">
               {stat.trend}
             </div>
           </div>

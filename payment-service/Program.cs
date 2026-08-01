@@ -21,6 +21,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Automatically create the auctxi-payment database and tables on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
+
 app.UseCors("AllowAll");
 
 app.UseAuthorization();

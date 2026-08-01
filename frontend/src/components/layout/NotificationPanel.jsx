@@ -72,9 +72,9 @@ const NotificationPanel = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-secondary-900 rounded-xl shadow-lg border border-secondary-200 dark:border-secondary-800 z-50 overflow-hidden transform origin-top-right transition-all">
-          <div className="px-4 py-3 border-b border-secondary-200 dark:border-secondary-800 flex justify-between items-center bg-secondary-50 dark:bg-secondary-800/50">
-            <h3 className="text-sm font-bold text-secondary-900 dark:text-white">Notifications {unreadCount > 0 && `(${unreadCount})`}</h3>
+        <div className="absolute right-0 mt-3 w-84 bg-white/90 dark:bg-secondary-900/90 backdrop-blur-3xl rounded-2xl shadow-2xl border border-white/50 dark:border-secondary-800/80 z-50 overflow-hidden transform origin-top-right transition-all">
+          <div className="px-5 py-4 border-b border-secondary-200/50 dark:border-secondary-800/50 flex justify-between items-center bg-white/50 dark:bg-secondary-900/50">
+            <h3 className="text-sm font-bold text-secondary-900 dark:text-white">Notifications {unreadCount > 0 && <span className="bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full text-xs ml-1">{unreadCount} New</span>}</h3>
             <button onClick={handleMarkAllAsRead} className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 flex items-center gap-1">
               <IconCheck size={14} /> Mark all as read
             </button>
@@ -86,14 +86,14 @@ const NotificationPanel = () => {
                   <li 
                     key={notif.id} 
                     onClick={() => !notif.is_read && handleMarkAsRead(notif.id)}
-                    className={`p-4 hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors cursor-pointer ${!notif.is_read ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''}`}
+                    className={`p-4 hover:bg-secondary-50/80 dark:hover:bg-secondary-800/40 transition-colors cursor-pointer group ${!notif.is_read ? 'bg-primary-50/30 dark:bg-primary-900/10' : ''}`}
                   >
                     <div className="flex gap-3">
                       <div className="flex-1">
-                        <p className={`text-sm font-semibold mb-1 ${!notif.is_read ? 'text-secondary-900 dark:text-white' : 'text-secondary-700 dark:text-secondary-300'}`}>
+                        <p className={`text-sm font-bold mb-1 group-hover:text-primary-600 transition-colors ${!notif.is_read ? 'text-secondary-900 dark:text-white' : 'text-secondary-700 dark:text-secondary-300'}`}>
                           {notif.subject}
                         </p>
-                        <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1 leading-snug line-clamp-2">
+                        <p className="text-sm font-medium text-secondary-600 dark:text-secondary-400 mb-1.5 leading-snug line-clamp-2">
                           {notif.message_text}
                         </p>
                         <p className="text-xs text-secondary-400 dark:text-secondary-500">
@@ -113,8 +113,8 @@ const NotificationPanel = () => {
               </div>
             )}
           </div>
-          <div className="px-4 py-2 border-t border-secondary-200 dark:border-secondary-800 bg-secondary-50 dark:bg-secondary-800/50 text-center">
-            <button className="text-xs font-medium text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-white transition-colors">
+          <div className="px-5 py-3 border-t border-secondary-200/50 dark:border-secondary-800/50 bg-white/50 dark:bg-secondary-900/50 text-center">
+            <button className="text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
               View All Notifications
             </button>
           </div>

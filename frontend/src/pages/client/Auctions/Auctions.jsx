@@ -12,12 +12,12 @@ const Auctions = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-secondary-900 dark:text-white">
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent drop-shadow-sm tracking-tight">
             Franchise Auctions
           </h1>
-          <p className="mt-1 text-sm text-secondary-500 dark:text-secondary-400">
+          <p className="mt-2 text-sm text-secondary-500 dark:text-secondary-400 font-medium">
             Join your registered live auctions and start bidding.
           </p>
         </div>

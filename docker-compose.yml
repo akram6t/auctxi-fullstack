@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: auctxi-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: manager
+      MYSQL_DATABASE: auctxi
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Uncomment the next line if you want to initialize the DB with a sql script
+      # - ./mock_data.sql:/docker-entrypoint-initdb.d/mock_data.sql
+    restart: unless-stopped
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: auctxi-api-gateway
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./api-gateway/.env
+    depends_on:
+      - auction-server
+      - payment-service
+      - chatbot-service
+      - notification-server
+    restart: unless-stopped
+
+  auction-server:
+    build: ./auction-server
+    container_name: auctxi-auction-server
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auctxi?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: manager
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  payment-service:
+    build: ./payment-service
+    container_name: auctxi-payment-service
+    ports:
+      - "5001:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=auctxi-payment;Uid=root;Pwd=manager;"
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  chatbot-service:
+    build: ./chatbot-service
+    container_name: auctxi-chatbot-service
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: manager
+      DB_NAME: auctxi
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  notification-server:
+    build: ./notification-server
+    container_name: auctxi-notification-server
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./notification-server/.env
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: manager
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: auctxi-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

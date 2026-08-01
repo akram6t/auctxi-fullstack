@@ -24,37 +24,37 @@ const UpcomingAuctionsWidget = () => {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 h-full flex flex-col">
-      <div className="px-6 py-5 border-b border-secondary-200 dark:border-secondary-800">
-        <h3 className="text-lg leading-6 font-semibold text-secondary-900 dark:text-white">Upcoming Registered Events</h3>
+    <div className="bg-white/70 dark:bg-secondary-900/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl border border-white/40 dark:border-secondary-800/60 h-full flex flex-col overflow-hidden">
+      <div className="px-6 py-5 border-b border-secondary-200/50 dark:border-secondary-800/50 bg-white/50 dark:bg-secondary-900/50">
+        <h3 className="text-lg leading-6 font-bold text-secondary-900 dark:text-white">Upcoming Registered Events</h3>
       </div>
-      <div className="flex-1 overflow-y-auto p-0">
-        <ul className="divide-y divide-secondary-200 dark:divide-secondary-800">
+      <div className="flex-1 overflow-y-auto p-2">
+        <ul className="space-y-2">
           {loading ? (
             <div className="p-6 text-center text-secondary-500">Loading events...</div>
           ) : upcomingAuctions.length === 0 ? (
             <div className="p-6 text-center text-secondary-500 text-sm">No upcoming events.</div>
           ) : (
             upcomingAuctions.map((auction) => (
-              <li key={auction.id} className="p-6 hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors">
+              <li key={auction.id} className="p-5 mx-2 my-1 bg-white dark:bg-secondary-800/30 hover:bg-primary-50/50 dark:hover:bg-secondary-800/80 transition-colors rounded-2xl border border-secondary-100 dark:border-secondary-700/30 group cursor-default">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-secondary-900 dark:text-white">{auction.name}</p>
+                  <p className="text-base font-bold text-secondary-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{auction.name}</p>
                   <div className="ml-2 flex-shrink-0 flex">
-                    <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      auction.status === 'ACTIVE' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                    <p className={`px-2.5 py-1 inline-flex text-[10px] leading-4 font-bold rounded-full uppercase tracking-wider ${
+                      auction.status === 'ACTIVE' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
                     }`}>
                       {auction.status || 'UPCOMING'}
                     </p>
                   </div>
                 </div>
-                <div className="mt-2 sm:flex sm:justify-between">
-                  <div className="sm:flex text-sm text-secondary-500 dark:text-secondary-400 gap-4">
+                <div className="mt-3 sm:flex sm:justify-between">
+                  <div className="sm:flex text-sm text-secondary-500 dark:text-secondary-400 gap-6 font-medium">
                     <p className="flex items-center">
-                      <IconCalendar size={16} className="mr-1.5 flex-shrink-0 text-secondary-400" />
+                      <IconCalendar size={18} className="mr-2 flex-shrink-0 text-primary-500 dark:text-primary-400" />
                       {auction.date ? new Date(auction.date).toLocaleDateString() : 'TBD'}
                     </p>
                     <p className="mt-2 flex items-center sm:mt-0">
-                      <IconMapPin size={16} className="mr-1.5 flex-shrink-0 text-secondary-400" />
+                      <IconMapPin size={18} className="mr-2 flex-shrink-0 text-blue-500 dark:text-blue-400" />
                       Online
                     </p>
                   </div>

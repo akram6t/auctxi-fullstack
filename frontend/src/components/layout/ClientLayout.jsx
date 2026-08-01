@@ -14,6 +14,17 @@ import {
   IconX
 } from '@tabler/icons-react';
 import NotificationPanel from './NotificationPanel';
+import { motion } from 'framer-motion';
+
+// Pre-generate bubbles so they don't recreate on re-renders
+const bubbles = Array.from({ length: 15 }).map((_, i) => ({
+  id: i,
+  size: Math.random() * 60 + 20,
+  x: Math.random() * 100,
+  delay: Math.random() * 5,
+  duration: Math.random() * 10 + 15,
+  wobble: Math.random() * 100 - 50
+}));
 
 const ClientLayout = () => {
   const { user, logout } = useAuth();
@@ -34,9 +45,40 @@ const ClientLayout = () => {
   ];
 
   return (
-    <div className="flex flex-col h-screen bg-secondary-50 dark:bg-secondary-950 overflow-hidden">
-      {/* Top Navigation Bar */}
-      <header className="h-16 bg-white dark:bg-secondary-900 border-b border-secondary-200 dark:border-secondary-800 flex items-center justify-between px-4 sm:px-6 z-20 flex-shrink-0 transition-colors duration-200 shadow-sm">
+    <div className="flex flex-col h-screen bg-yellow-50/80 dark:bg-secondary-950/80 overflow-hidden relative selection:bg-primary-500/30">
+      {/* Animated Bubble Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {bubbles.map((bubble) => (
+          <motion.div
+            key={bubble.id}
+            className="absolute rounded-full bg-yellow-300/30 dark:bg-yellow-600/10 backdrop-blur-[2px] shadow-[inset_0_0_10px_rgba(255,255,255,0.5)]"
+            style={{
+              width: bubble.size,
+              height: bubble.size,
+              left: `${bubble.x}%`,
+              bottom: -100,
+            }}
+            animate={{
+              y: [0, -window.innerHeight - 200],
+              x: [0, bubble.wobble],
+              rotate: [0, 360]
+            }}
+            transition={{
+              duration: bubble.duration,
+              repeat: Infinity,
+              delay: bubble.delay,
+              ease: "linear"
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Background Decorators */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-yellow-400/20 blur-[120px] pointer-events-none z-0"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-orange-400/10 blur-[120px] pointer-events-none z-0"></div>
+
+      {/* Top Navigation Bar (Glassmorphic) */}
+      <header className="h-16 backdrop-blur-xl bg-white/70 dark:bg-secondary-900/70 border-b border-secondary-200/50 dark:border-secondary-800/50 flex items-center justify-between px-4 sm:px-6 z-20 flex-shrink-0 transition-colors duration-200 sticky top-0 shadow-sm">
         
         {/* Brand & Desktop Links */}
         <div className="flex items-center gap-8 h-full">
@@ -50,22 +92,35 @@ const ClientLayout = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center h-full space-x-1">
+          <nav className="hidden md:flex items-center h-full space-x-1 ml-4">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
                   clsx(
-                    'flex items-center gap-2 h-full px-3 text-sm font-medium border-b-2 transition-all duration-200',
+                    'group relative flex items-center gap-2 h-full px-4 text-sm font-semibold transition-all duration-200 ease-out',
                     isActive
-                      ? 'border-primary-600 text-primary-700 dark:text-primary-400 dark:border-primary-400'
-                      : 'border-transparent text-secondary-600 hover:text-secondary-900 hover:border-secondary-300 dark:text-secondary-400 dark:hover:text-secondary-100 dark:hover:border-secondary-600'
+                      ? 'text-primary-600 dark:text-primary-400'
+                      : 'text-secondary-500 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-white'
                   )
                 }
               >
-                <link.icon size={18} stroke={1.5} />
-                {link.name}
+                {({ isActive }) => (
+                  <>
+                    <link.icon 
+                      size={18} 
+                      stroke={isActive ? 2 : 1.5} 
+                      className={clsx('transition-transform duration-200 group-hover:scale-110')}
+                    />
+                    {link.name}
+                    
+                    {/* Active Indicator Line */}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-primary-500 to-blue-500 rounded-t-md"></span>
+                    )}
+                  </>
+                )}
               </NavLink>
             ))}
           </nav>
@@ -141,8 +196,8 @@ const ClientLayout = () => {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-x-hidden overflow-y-auto bg-secondary-50 dark:bg-secondary-950 p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-7xl">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto z-10 p-4 sm:p-6 lg:p-8 scroll-smooth">
+        <div className="mx-auto max-w-7xl relative">
           <Outlet />
         </div>
       </main>

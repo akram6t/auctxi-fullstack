@@ -176,10 +176,10 @@ const WalletOverview = () => {
   return (
     <>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <div className="md:col-span-2 bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-700 dark:to-primary-900 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+      <div className="md:col-span-2 bg-gradient-to-r from-primary-600 via-blue-600 to-indigo-700 dark:from-primary-700 dark:via-blue-800 dark:to-indigo-900 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8 text-white relative overflow-hidden group">
         {/* Background Pattern */}
-        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-primary-400 opacity-20 rounded-full blur-xl"></div>
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+        <div className="absolute bottom-0 right-1/3 w-40 h-40 bg-purple-400 opacity-20 rounded-full blur-2xl group-hover:-translate-x-4 transition-transform duration-700"></div>
         
         <div className="relative z-10 flex flex-col h-full justify-between">
           <div className="flex justify-between items-start">
@@ -209,12 +209,12 @@ const WalletOverview = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-secondary-900 shadow-sm rounded-xl border border-secondary-200 dark:border-secondary-800 p-6 flex flex-col justify-center gap-4">
-         <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">Quick Actions</h3>
-         <button onClick={() => setShowModal(true)} className="w-full flex items-center justify-center gap-2 py-3 bg-secondary-100 dark:bg-secondary-800 hover:bg-secondary-200 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white font-medium rounded-lg transition-colors">
+      <div className="bg-white/70 dark:bg-secondary-900/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl border border-white/40 dark:border-secondary-800/60 p-6 flex flex-col justify-center gap-4">
+         <h3 className="text-lg font-bold text-secondary-900 dark:text-white mb-2">Quick Actions</h3>
+         <button onClick={() => setShowModal(true)} className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-primary-500 to-blue-600 hover:from-primary-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
            <IconCreditCard size={20} /> Request Purse Top-up
          </button>
-         <button onClick={handleDownloadStatements} className="w-full flex items-center justify-center gap-2 py-3 border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-800/50 text-secondary-700 dark:text-secondary-300 font-medium rounded-lg transition-colors">
+         <button onClick={handleDownloadStatements} className="w-full flex items-center justify-center gap-2 py-3.5 bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-700 text-secondary-700 dark:text-secondary-300 font-bold rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
            <IconReceipt size={20} /> Download Statements
          </button>
       </div>
@@ -223,7 +223,7 @@ const WalletOverview = () => {
     {/* Add Funds Modal */}
     {showModal && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-        <div className="bg-white dark:bg-secondary-900 rounded-xl shadow-xl w-full max-w-md overflow-hidden border border-secondary-200 dark:border-secondary-800">
+        <div className="bg-white/90 dark:bg-secondary-900/90 backdrop-blur-3xl rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/50 dark:border-secondary-800/80 transform transition-all">
           <div className="flex items-center justify-between p-6 border-b border-secondary-200 dark:border-secondary-800">
             <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">Top-up Wallet Purse</h3>
             <button 
@@ -248,7 +248,7 @@ const WalletOverview = () => {
                   id="amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="appearance-none block w-full pl-8 pr-3 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white transition-shadow"
+                  className="appearance-none block w-full pl-8 pr-3 py-3.5 border-none bg-secondary-50 dark:bg-secondary-800/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-secondary-900 dark:text-white transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] font-bold text-lg"
                   placeholder="e.g. 50000"
                   min="1"
                 />
@@ -262,14 +262,14 @@ const WalletOverview = () => {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border border-secondary-300 dark:border-secondary-700 rounded-lg text-sm font-medium text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-800 transition-colors"
+                className="px-5 py-2.5 bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-700 rounded-xl text-sm font-bold text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 transition-colors shadow-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading || !amount}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-2 hover:-translate-y-0.5"
               >
                 {loading ? <IconLoader2 size={16} className="animate-spin" /> : null}
                 Proceed to Pay
