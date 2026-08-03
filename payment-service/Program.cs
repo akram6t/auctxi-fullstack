@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentService.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -32,6 +34,14 @@ app.UseCors("AllowAll");
 
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapOpenApi();
+app.MapScalarApiReference(options =>
+{
+    options.Title = "Payment Service API";
+    options.Theme = ScalarTheme.Mars;
+    options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
+});
 
 // Add a simple root endpoint for checking server status in the browser
 app.MapGet("/", () => "Payment Service is running");

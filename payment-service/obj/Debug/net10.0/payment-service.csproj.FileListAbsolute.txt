@@ -120,3 +120,7 @@
 /home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+/home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/bin/Debug/net10.0/Microsoft.AspNetCore.OpenApi.dll
+/home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/bin/Debug/net10.0/Microsoft.OpenApi.dll
+/home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/bin/Debug/net10.0/Scalar.AspNetCore.dll
+/home/akram/.gemini/antigravity/scratch/auctxi-web/payment-service/obj/Debug/net10.0/payment-service.MvcApplicationPartsAssemblyInfo.cs
